@@ -28,9 +28,9 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellVer, "v", "- Displays the current version data.");
+            sc = new TSOS.ShellCommand(this.shellVer, "v");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellVer, "version", "- Displays the current version data.");
+            sc = new TSOS.ShellCommand(this.shellVer, "version");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellVer, "v");
             sc = new TSOS.ShellCommand(this.shellVer, "version");
@@ -261,7 +261,7 @@ var TSOS;
         };
         Shell.prototype.shellDate = function (args) {
             var d = new Date();
-            _StdOut.putText("Command being executed after date");
+            _StdOut.putText("Command being executed after date" + d);
             _StdOut.putText(d);
         };
         Shell.prototype.shellWhereami = function (args) {
