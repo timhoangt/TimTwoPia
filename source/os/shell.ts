@@ -236,6 +236,8 @@ module TSOS {
                 switch (topic) {
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version of the operating system you are using.");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
                     case "ver":
