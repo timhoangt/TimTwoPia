@@ -303,6 +303,7 @@ module TSOS {
         public shellDate(args) {
             var d = new Date();
             _StdOut.putText(d);
+            _StdOut.putText("Command being executed" + d);
         }
 
          public shellWhereami(args) {
