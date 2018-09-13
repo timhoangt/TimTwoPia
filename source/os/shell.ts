@@ -39,9 +39,11 @@ module TSOS {
 
             sc = new ShellCommand(this.shellVer,
                                   "v");
+            this.commandList[this.commandList.length] = sc;
 
             sc = new ShellCommand(this.shellVer,
                                   "version");
+            this.commandList[this.commandList.length] = sc;
 
             // help
             sc = new ShellCommand(this.shellHelp,
