@@ -311,7 +311,7 @@ module TSOS {
             var day = date.getDate()
             var month = date.getMonth() + 1
             var year = date.getFullYear()
-            _StdOut.putText("<b>" + day + "/" + month + "/" + year + "</b>")
+            _StdOut.putText(day + "/" + month + "/" + year)
         }
 
          public shellWhereami(args) {
