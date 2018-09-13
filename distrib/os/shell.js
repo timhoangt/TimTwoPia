@@ -29,10 +29,6 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellVer, "v");
-            this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellVer, "version");
-            this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellVer, "v");
             sc = new TSOS.ShellCommand(this.shellVer, "version");
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
@@ -261,9 +257,12 @@ var TSOS;
         };
         Shell.prototype.shellDate = function (args) {
             var d = new Date();
+            d.setHours(0, 0, 0, 0);
             _StdOut.putText("The date is " + d);
         };
         Shell.prototype.shellWhereami = function (args) {
+            var zone = new Date().getTimezoneOffset();
+            _StdOut.putText("You are in " + zone);
         };
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {

@@ -39,14 +39,6 @@ module TSOS {
 
             sc = new ShellCommand(this.shellVer,
                                   "v");
-            this.commandList[this.commandList.length] = sc;
-
-            sc = new ShellCommand(this.shellVer,
-                                  "version");
-            this.commandList[this.commandList.length] = sc;
-
-            sc = new ShellCommand(this.shellVer,
-                                  "v");
 
             sc = new ShellCommand(this.shellVer,
                                   "version");
@@ -316,11 +308,13 @@ module TSOS {
 
         public shellDate(args) {
             var d = new Date();
+            d.setHours(0, 0, 0, 0);
             _StdOut.putText("The date is " + d);
         }
 
          public shellWhereami(args) {
-            
+            var zone = new Date().getTimezoneOffset();
+            _StdOut.putText("You are in " + zone);
         }
 
         public shellPrompt(args) {
