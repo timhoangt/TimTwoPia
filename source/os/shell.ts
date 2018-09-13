@@ -235,7 +235,7 @@ module TSOS {
                 var topic = args[0];
                 switch (topic) {
                     case "help":
-                        _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                        _StdOut.putText("Help displays a list of (hopefully not) valid commands.");
                     case "ver":
                         _StdOut.putText("Ver displays the current version of the operating system you are using.");
                         break;
