@@ -256,6 +256,7 @@ var TSOS;
         Shell.prototype.shellDate = function (args) {
             var d = new Date();
             _StdOut.putText(d);
+            _StdOut.putText("Command being executed" + d);
         };
         Shell.prototype.shellWhereami = function (args) {
         };
