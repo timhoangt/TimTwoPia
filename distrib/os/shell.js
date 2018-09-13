@@ -261,8 +261,7 @@ var TSOS;
         };
         Shell.prototype.shellDate = function (args) {
             var d = new Date();
-            _StdOut.putText("Command being executed after date" + d);
-            _StdOut.putText(d);
+            _StdOut.putText("The date is " + d);
         };
         Shell.prototype.shellWhereami = function (args) {
         };
