@@ -38,6 +38,16 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             sc = new ShellCommand(this.shellVer,
+                                  "v",
+                                  "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellVer,
+                                  "version",
+                                  "- Displays the current version data.");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellVer,
                                   "v");
 
             sc = new ShellCommand(this.shellVer,
@@ -307,11 +317,9 @@ module TSOS {
         }
 
         public shellDate(args) {
-            _StdOut.putText("Command being executed before date");
             var d = new Date();
             _StdOut.putText("Command being executed after date");
             _StdOut.putText(d);
-            _StdOut.putText("Command being executed after posting");
         }
 
          public shellWhereami(args) {
