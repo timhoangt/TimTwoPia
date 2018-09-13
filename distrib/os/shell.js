@@ -256,13 +256,16 @@ var TSOS;
             }
         };
         Shell.prototype.shellDate = function (args) {
-            var d = new Date();
-            d.setHours(0, 0, 0, 0);
-            _StdOut.putText("The date is " + d);
+            var date = new Date();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            _StdOut.putText("<b>" + day + "/" + month + "/" + year + "</b>");
         };
         Shell.prototype.shellWhereami = function (args) {
-            var zone = new Date().getTimezoneOffset();
-            _StdOut.putText("You are in " + zone);
+            var d = new Date(); // or whatever date you have
+            var tzName = d.toLocaleString('en', { timeZoneName: 'short' }).split(' ').pop();
+            _StdOut.putText("You are in " + tzName);
         };
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {
