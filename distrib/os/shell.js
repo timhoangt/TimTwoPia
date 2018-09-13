@@ -254,7 +254,11 @@ var TSOS;
             }
         };
         Shell.prototype.shellDate = function (args) {
-            _StdOut.putText("Command being executed");
+            _StdOut.putText("Command being executed before date");
+            var d = new Date();
+            _StdOut.putText("Command being executed after date");
+            _StdOut.putText(d);
+            _StdOut.putText("Command being executed after posting");
         };
         Shell.prototype.shellWhereami = function (args) {
         };
