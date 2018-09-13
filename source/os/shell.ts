@@ -316,8 +316,7 @@ module TSOS {
 
         public shellDate(args) {
             var d = new Date();
-            _StdOut.putText("Command being executed after date" + d);
-            _StdOut.putText(d);
+            _StdOut.putText("The date is " + d);
         }
 
          public shellWhereami(args) {
