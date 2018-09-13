@@ -93,6 +93,11 @@ module TSOS {
                                   "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
 
+            sc = new ShellCommand(this.shellWindow,
+                                  "window",
+                                  "- Displays the window url.");
+            this.commandList[this.commandList.length] = sc;
+
             // whereami
             sc = new ShellCommand(this.shellWhereami,
                                   "whereami",
@@ -316,10 +321,14 @@ module TSOS {
             _StdOut.putText(day + "/" + month + "/" + year)
         }
 
-         public shellWhereami(args) {
+        public shellWhereami(args) {
             var d = new Date(); // or whatever date you have
             var tzName = d.toLocaleString('en', {timeZoneName:'short'}).split(' ').pop();
             _StdOut.putText("You are in " + tzName);
+        }
+
+        public shellWindow(args) {
+            _StdOut.putText("Page location is " + window.location.href);
         }
 
         public shellPrompt(args) {
