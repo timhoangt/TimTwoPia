@@ -94,9 +94,26 @@ module TSOS {
             var h: number = today.getHours();
             var m: number = today.getMinutes();
             var s: number = today.getSeconds();
-            var str: string = h + ":" + m + ":" + s;
-            var taTime = <HTMLInputElement> document.getElementById("taTime");
-            taTime.value = str;
+            if (m < 10 && s > 10) {
+                var str: string = h + ":0" + m + ":" + s;
+                var taTime = <HTMLInputElement> document.getElementById("taTime");
+                taTime.value = str;
+            };
+            else if (s < 10 && m > 10) {
+                var str: string = h + ":" + m + ":0" + s;
+                var taTime = <HTMLInputElement> document.getElementById("taTime");
+                taTime.value = str;
+            };
+            else if (s > 10 && m > 10) {
+                var str: string = h + ":" + m + ":" + s;
+                var taTime = <HTMLInputElement> document.getElementById("taTime");
+                taTime.value = str;
+            };
+            else {
+                var str: string = h + ":0" + m + ":0" + s;
+                var taTime = <HTMLInputElement> document.getElementById("taTime");
+                taTime.value = str;
+            };
 
             /* Get the time.
             var now: number = new Date();
@@ -105,7 +122,7 @@ module TSOS {
               Update the log console.
             var taTime = <HTMLInputElement> document.getElementById("taTime");
             taTime.value = str; */
-         }
+        }
 
 
         //

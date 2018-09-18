@@ -80,9 +80,30 @@ var TSOS;
             var h = today.getHours();
             var m = today.getMinutes();
             var s = today.getSeconds();
-            var str = h + ":" + m + ":" + s;
-            var taTime = document.getElementById("taTime");
-            taTime.value = str;
+            if (m < 10 && s > 10) {
+                var str = h + ":0" + m + ":" + s;
+                var taTime = document.getElementById("taTime");
+                taTime.value = str;
+            }
+            ;
+            if (s < 10 && m > 10) {
+                var str = h + ":" + m + ":0" + s;
+                var taTime = document.getElementById("taTime");
+                taTime.value = str;
+            }
+            ;
+            if (s > 10 && m > 10) {
+                var str = h + ":" + m + ":" + s;
+                var taTime = document.getElementById("taTime");
+                taTime.value = str;
+            }
+            ;
+            {
+                var str = h + ":0" + m + ":0" + s;
+                var taTime = document.getElementById("taTime");
+                taTime.value = str;
+            }
+            ;
             /* Get the time.
             var now: number = new Date();
               Build the log string.
