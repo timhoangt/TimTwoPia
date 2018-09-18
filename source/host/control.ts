@@ -83,12 +83,20 @@ module TSOS {
         }
 
         public static Time(msg: string, source: string = "?"): void {
-            var today = new Date();
+            /*var today = new Date();
             var h = today.getHours();
             var m = today.getMinutes();
             var s = today.getSeconds();
             document.getElementById('taTime').innerHTML =
-            h + ":" + m + ":" + s;
+            h + ":" + m + ":" + s;*/
+
+            // Get the time.
+            var now: number = new Date();
+             // Build the log string.
+            var str: date = now;
+             // Update the log console.
+            var taTime = <HTMLInputElement> document.getElementById("taTime");
+            taTime.value = str;
          }
 
 
