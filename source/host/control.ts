@@ -90,6 +90,14 @@ module TSOS {
             document.getElementById('taTime').innerHTML =
             h + ":" + m + ":" + s;*/
 
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            var str = h + ":" + m + ":" + s;
+            var taTime = <HTMLInputElement> document.getElementById("taTime");
+            taTime.value = str;
+
             /* Get the time.
             var now: number = new Date();
               Build the log string.
