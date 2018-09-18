@@ -90,13 +90,13 @@ module TSOS {
             document.getElementById('taTime').innerHTML =
             h + ":" + m + ":" + s;*/
 
-            // Get the time.
+            /* Get the time.
             var now: number = new Date();
-             // Build the log string.
+              Build the log string.
             var str: date = now;
-             // Update the log console.
+              Update the log console.
             var taTime = <HTMLInputElement> document.getElementById("taTime");
-            taTime.value = str;
+            taTime.value = str; */
          }
 
 

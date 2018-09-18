@@ -69,22 +69,20 @@ var TSOS;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
         Control.Time = function (msg, source) {
-           /* if (source === void 0) { source = "?"; }
-            var today = new Date();
+            /*var today = new Date();
             var h = today.getHours();
             var m = today.getMinutes();
             var s = today.getSeconds();
             document.getElementById('taTime').innerHTML =
-                h + ":" + m + ":" + s;*/
-
+            h + ":" + m + ":" + s;*/
             if (source === void 0) { source = "?"; }
-            // Get the time.
-            var now = new Date();
-            // Build the log string.
-            var str = now;
-            // Update the log console.
-            var taTime = document.getElementById("taTime");
-            taTime.value = str;
+            /* Get the time.
+            var now: number = new Date();
+              Build the log string.
+            var str: date = now;
+              Update the log console.
+            var taTime = <HTMLInputElement> document.getElementById("taTime");
+            taTime.value = str; */
         };
         //
         // Host Events
