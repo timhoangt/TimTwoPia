@@ -91,10 +91,10 @@ module TSOS {
             h + ":" + m + ":" + s;*/
 
             var today = new Date();
-            var h = today.getHours();
-            var m = today.getMinutes();
-            var s = today.getSeconds();
-            var str = h + ":" + m + ":" + s;
+            var h: number = today.getHours();
+            var m: number = today.getMinutes();
+            var s: number = today.getSeconds();
+            var str: string = h + ":" + m + ":" + s;
             var taTime = <HTMLInputElement> document.getElementById("taTime");
             taTime.value = str;
 
