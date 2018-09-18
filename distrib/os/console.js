@@ -83,6 +83,20 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+            var linePos = _DefaultFontSize +
+                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin;
+            // See if there are too many lines to fit in the canvas.
+            if (_Canvas.height < this.currentYPosition) {
+                // Change the Y position.
+                this.currentYPosition = this.currentYPosition - linePos;
+                // Copy whats on canvas.
+                var lineMemory = _DrawingContext.getImageData(0, linePos, _Canvas.width, this.currentYPosition);
+                // Reset canvas.
+                this.clearScreen();
+                //Reprint the data. 
+                _DrawingContext.putImageData(lineMemory, 0, 0);
+            }
         };
         return Console;
     }());

@@ -68,16 +68,6 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
-        Control.Time = function (msg, source) {
-            if (source === void 0) { source = "?"; }
-            // Get the time.
-            var now = new Date();
-            // Build the log string.
-            var str = now;
-            // Update the log console.
-            var taTime = document.getElementById("taTime");
-            taTime.value = str;
-        };
         //
         // Host Events
         //

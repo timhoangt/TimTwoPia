@@ -82,19 +82,6 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
-        public static Time(msg: string, source: string = "?"): void {
-
-            // Get the time.
-            var now: number = new Date();
-
-            // Build the log string.
-            var str: date = now;
-
-            // Update the log console.
-            var taTime = <HTMLInputElement> document.getElementById("taTime");
-            taTime.value = str;
-
-        }
 
 
         //
