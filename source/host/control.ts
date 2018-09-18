@@ -99,17 +99,17 @@ module TSOS {
                 var taTime = <HTMLInputElement> document.getElementById("taTime");
                 taTime.value = str;
             };
-            else if (s < 10 && m > 10) {
+            if (s < 10 && m > 10) {
                 var str: string = h + ":" + m + ":0" + s;
                 var taTime = <HTMLInputElement> document.getElementById("taTime");
                 taTime.value = str;
             };
-            else if (s > 10 && m > 10) {
+            if (s > 10 && m > 10) {
                 var str: string = h + ":" + m + ":" + s;
                 var taTime = <HTMLInputElement> document.getElementById("taTime");
                 taTime.value = str;
             };
-            else {
+            if (s < 10 && m < 10){
                 var str: string = h + ":0" + m + ":0" + s;
                 var taTime = <HTMLInputElement> document.getElementById("taTime");
                 taTime.value = str;

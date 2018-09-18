@@ -98,7 +98,7 @@ var TSOS;
                 taTime.value = str;
             }
             ;
-            {
+            if (s < 10 && m < 10) {
                 var str = h + ":0" + m + ":0" + s;
                 var taTime = document.getElementById("taTime");
                 taTime.value = str;
