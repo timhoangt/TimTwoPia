@@ -37,6 +37,12 @@ var TSOS;
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("taHostLog").value = "";
+            // Clear the log text box.
+            // Use the TypeScript cast to HTMLInputElement
+            document.getElementById("taTime").value = "";
+            // Clear the log text box.
+            // Use the TypeScript cast to HTMLInputElement
+            document.getElementById("taStatus").value = "";
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
@@ -61,6 +67,16 @@ var TSOS;
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
+        };
+        Control.Time = function (msg, source) {
+            if (source === void 0) { source = "?"; }
+            // Get the time.
+            var now = new Date();
+            // Build the log string.
+            var str = now;
+            // Update the log console.
+            var taTime = document.getElementById("taTime");
+            taTime.value = str;
         };
         //
         // Host Events
