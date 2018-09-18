@@ -99,6 +99,12 @@ module TSOS {
                                   "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
 
+            // status
+            sc = new ShellCommand(this.shellStatus,
+                                  "status",
+                                  "- Updates the status on the console.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -316,10 +322,17 @@ module TSOS {
             _StdOut.putText(day + "/" + month + "/" + year)
         }
 
-         public shellWhereami(args) {
+        public shellWhereami(args) {
             var d = new Date(); // or whatever date you have
             var tzName = d.toLocaleString('en', {timeZoneName:'short'}).split(' ').pop();
             _StdOut.putText("You are in " + tzName);
+        }
+
+        public shellStatus(args){
+            if (args.length > 0) {
+                var status = args[0];
+                
+            }
         }
 
         public shellPrompt(args) {

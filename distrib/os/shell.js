@@ -59,6 +59,9 @@ var TSOS;
             // whereami
             sc = new TSOS.ShellCommand(this.shellWhereami, "whereami", "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
+            // status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "- Updates the status on the console.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -268,6 +271,11 @@ var TSOS;
             var d = new Date(); // or whatever date you have
             var tzName = d.toLocaleString('en', { timeZoneName: 'short' }).split(' ').pop();
             _StdOut.putText("You are in " + tzName);
+        };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var status = args[0];
+            }
         };
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {
