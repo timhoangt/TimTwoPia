@@ -56,8 +56,6 @@ var TSOS;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellWindow, "window", "- Displays the window url.");
-            this.commandList[this.commandList.length] = sc;
             // whereami
             sc = new TSOS.ShellCommand(this.shellWhereami, "whereami", "- Displays the current location.");
             this.commandList[this.commandList.length] = sc;
@@ -270,9 +268,6 @@ var TSOS;
             var d = new Date(); // or whatever date you have
             var tzName = d.toLocaleString('en', { timeZoneName: 'short' }).split(' ').pop();
             _StdOut.putText("You are in " + tzName);
-        };
-        Shell.prototype.shellWindow = function (args) {
-            _StdOut.putText("Page location is " + window.location.href);
         };
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {
