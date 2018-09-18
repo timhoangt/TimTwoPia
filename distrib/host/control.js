@@ -85,20 +85,17 @@ var TSOS;
                 var taTime = document.getElementById("taTime");
                 taTime.value = str;
             }
-            ;
-            if (s < 10 && m > 10) {
+            else if (s < 10 && m > 10) {
                 var str = h + ":" + m + ":0" + s;
                 var taTime = document.getElementById("taTime");
                 taTime.value = str;
             }
-            ;
-            if (s > 10 && m > 10) {
+            else if (s > 10 && m > 10) {
                 var str = h + ":" + m + ":" + s;
                 var taTime = document.getElementById("taTime");
                 taTime.value = str;
             }
-            ;
-            if (s < 10 && m < 10) {
+            else if (s < 10 && m < 10) {
                 var str = h + ":0" + m + ":0" + s;
                 var taTime = document.getElementById("taTime");
                 taTime.value = str;
