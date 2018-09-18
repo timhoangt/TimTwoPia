@@ -82,6 +82,14 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        public static Time(msg: string, source: string = "?"): void {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            document.getElementById('taTime').innerHTML =
+            h + ":" + m + ":" + s;
+         }
 
 
         //
