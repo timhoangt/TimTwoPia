@@ -59,7 +59,10 @@ module TSOS {
                     chr = String.fromCharCode(keyCode);
                     _KernelInputQueue.enqueue(chr);
                 }
-                else if ((keyCode >= 48) && (keyCode <= 57)){ //digits
+                else if ((keyCode >= 48) && (keyCode <= 57) ||//digits
+                         (keyCode >= 186) && (keyCode <= 192)||// semicolon, equals, comma, minus, period, forward slash, tick
+                         (keyCode >= 219) && (keyCode <= 222)){//left bracket, back slash, right bracket, single quotes
+    
                     if (isShifted) { //check if shift, if it is, setit to the symbol
                         if (keyCode == 48){
                             chr = ")";
