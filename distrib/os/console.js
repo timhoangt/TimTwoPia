@@ -116,8 +116,8 @@ var TSOS;
             _DrawingContext.fillStyle = "blue"; //make the screen blue
             _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
             _DrawingContext.fillStyle = "white";
-            _DrawingContext.fillText(this.currentFont, this.currentFontSize, 5, 20, "YA DONE GOOFED"); //add text and error message
-            _DrawingContext.fillText(this.currentFont, this.currentFontSize, 5, 40, msg);
+            _DrawingContext.fillText(this.currentFont + "YA DONE GOOFED", this.currentFontSize, 5, 20, "YA DONE GOOFED"); //add text and error message
+            _DrawingContext.fillText(this.currentFont + msg, this.currentFontSize, 5, 40, msg);
         };
         return Console;
     }());
