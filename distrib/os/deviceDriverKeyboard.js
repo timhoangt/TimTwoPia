@@ -62,8 +62,8 @@ var TSOS;
             }
             else if (((keyCode >= 48) && (keyCode <= 57)) || // digits
                 (keyCode == 32) || // space
-                (keyCode >= 186) && (keyCode <= 222) || // punctuation and symbols
-                (keyCode >= 104) && (keyCode <= 111) || // more symbols
+                ((keyCode >= 186) && (keyCode <= 222)) || // punctuation and symbols
+                ((keyCode >= 104) && (keyCode <= 111)) || // more symbols
                 (keyCode == 13)) { // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
