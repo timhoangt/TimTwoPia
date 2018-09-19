@@ -27,7 +27,7 @@ module TSOS {
 
     export class Control {
 
-        public static status : string;
+
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
@@ -83,15 +83,15 @@ module TSOS {
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
+            public static msg : string;
 
-              public static updateStatus(status : string ) : void
-        {
-            // Update status
-            this.status = status;
-             // Update status bar
-            var taStatus = <HTMLInputElement> document.getElementById("taStatus");
-            taStatus.value = status;
-        }
+            public static updateStatus(msg : string ) : void {
+                // Update status
+                this.msg = msg;
+                 // Update status bar
+                var taStatus = <HTMLInputElement> document.getElementById("taStatus");
+                taStatus.value = msg;
+                }
 
         public static Time(msg: string, source: string = "?"): void {
             /*var today = new Date();

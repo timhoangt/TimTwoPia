@@ -332,7 +332,7 @@ module TSOS {
             if( args.length > 0)
                 Control.updateStatus(args.join(' '));
             else
-                _StdOut.putText("Usage: status <string> - Please provide a string status message.");
+                _StdOut.putText("Usage: status <string> - Please supply a string.");
         }
 
         public shellPrompt(args) {
