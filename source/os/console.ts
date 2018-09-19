@@ -53,7 +53,6 @@ module TSOS {
                 }
                 else if( chr == String.fromCharCode(9)) //dont tab
                 {
-                    this.commandCompletion();
                 }
                 else {
                     // This is a "normal" character, so ...
