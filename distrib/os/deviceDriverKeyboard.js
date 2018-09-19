@@ -72,7 +72,7 @@ var TSOS;
             else if ((keyCode >= 48) && (keyCode <= 57) || //digits
                 (keyCode >= 186) && (keyCode <= 192) || // semicolon, equals, comma, minus, period, forward slash, tick
                 (keyCode >= 219) && (keyCode <= 222)) { //left bracket, back slash, right bracket, single quotes
-                if (isShifted) { //check if shift, if it is, setit to the symbol
+                if (isShifted) { //check if shift, if it is, set it to the symbol
                     if (keyCode == 48) {
                         chr = ")";
                     }
@@ -106,6 +106,69 @@ var TSOS;
                     else if (keyCode == 186) {
                         chr = ":";
                     }
+                    else if (keyCode == 187) {
+                        chr = "+";
+                    }
+                    else if (keyCode == 188) {
+                        chr = "<";
+                    }
+                    else if (keyCode == 189) {
+                        chr = "_";
+                    }
+                    else if (keyCode == 190) {
+                        chr = ">";
+                    }
+                    else if (keyCode == 191) {
+                        chr = "?";
+                    }
+                    else if (keyCode == 192) {
+                        chr = "~";
+                    }
+                    else if (keyCode == 219) {
+                        chr = "{";
+                    }
+                    else if (keyCode == 220) {
+                        chr = "|";
+                    }
+                    else if (keyCode == 221) {
+                        chr = "}";
+                    }
+                    else if (keyCode == 222) {
+                        chr = "\"";
+                    }
+                }
+                else if (keyCode == 186) {
+                    chr = ";";
+                }
+                else if (keyCode == 187) {
+                    chr = "=";
+                }
+                else if (keyCode == 188) {
+                    chr = ",";
+                }
+                else if (keyCode == 189) {
+                    chr = "-";
+                }
+                else if (keyCode == 190) {
+                    chr = ".";
+                }
+                else if (keyCode == 191) {
+                    chr = "/";
+                }
+                else if (keyCode == 192) {
+                    chr = "`";
+                }
+                else if (keyCode == 219) {
+                    chr = "[";
+                }
+                else if (keyCode == 220) {
+                    chr = '\\';
+                }
+                else if (keyCode == 221) {
+                    chr = "]";
+                }
+                else if (keyCode == 222) {
+                    chr = "'";
                 }
                 else {
                     chr = String.fromCharCode(keyCode);
