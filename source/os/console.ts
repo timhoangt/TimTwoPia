@@ -129,8 +129,9 @@ module TSOS {
             _DrawingContext.fillStyle = "blue"; //make the screen blue
             _DrawingContext.fillRect(0,0,_Canvas.width,_Canvas.height);
             _DrawingContext.fillStyle = "white";
-            _DrawingContext.fillText("YA DONE GOOFED", 50, 20, 20); //add text and error message
-            _DrawingContext.fillText("details:" + msg, 50, 40, 40);
+            _DrawingContext.font = "30px Arial";
+            _DrawingContext.fillText("YA DONE GOOFED", 150, 50); //add text and error message
+            _DrawingContext.fillText("details:" + msg, 150, 100);
          }
 
 
