@@ -53,6 +53,8 @@ module TSOS {
                 }
                 else if( chr == String.fromCharCode(9)) //dont tab
                 {
+                    this.deleteChar();
+                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -143,7 +145,7 @@ module TSOS {
             var sc : ShellCommand = null;
             if (this.buffer == "")
               return;
-            for (var i = 0; (i < _OsShell.commandList.length) && (match = false); i++) //this checks the commands
+            for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
             {
                 sc = _OsShell.commandList[i];
                 if ( sc.command.search(this.buffer) == 0)
