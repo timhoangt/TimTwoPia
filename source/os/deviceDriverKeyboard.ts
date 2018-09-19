@@ -94,6 +94,9 @@ module TSOS {
                         else if (keyCode == 57){
                             chr = "(";
                         }
+                        else if (keyCode == 186){
+                            chr = ":";
+                        }
                     }
                     else {
                         chr = String.fromCharCode(keyCode);
