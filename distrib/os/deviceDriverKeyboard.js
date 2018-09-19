@@ -175,11 +175,17 @@ var TSOS;
                 }
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (keyCode == 8) // backspace
-             {
+            else if (keyCode == 8) { // backspace
                 chr = String.fromCharCode(8);
                 ;
                 _KernelInputQueue.enqueue(chr);
+            }
+            else if (keyCode == 9) { // tab
+                _Console.commandCompletion();
+            }
+            else if (keyCode == 38) { // up arrow
+            }
+            else if (keyCode == 40) { // down arrow
             }
         };
         return DeviceDriverKeyboard;

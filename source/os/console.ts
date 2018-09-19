@@ -134,6 +134,27 @@ module TSOS {
             _DrawingContext.fillText("details:" + msg, 150, 100);
          }
 
+        public commandCompletion() : void
+        {
+            var match : boolean = false;
+            var sc : ShellCommand = null;
+            if (this.buffer == "")
+              return;
+            for (var i = 0; (i < _OsShell.commandList.length) && (match = false); i++) //this checks the commands
+            {
+                sc = _OsShell.commandList[i];
+                if ( sc.command.search(this.buffer) == 0)
+                {
+                    match = true;
+                }
+            }
+            if (match) //when match is true, replace the text
+            {
+                this.putText(sc.command.substr(this.buffer.length));
+                this.buffer = sc.command;
+            }
+        }
+
 
   
     }
