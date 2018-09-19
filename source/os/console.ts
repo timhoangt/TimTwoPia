@@ -48,7 +48,7 @@ module TSOS {
                 } 
                 else if( chr == String.fromCharCode(8)) //activate the delete function when backspace is pressed
                 {
-                    this.delete();
+                    this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
                 else {
@@ -113,7 +113,7 @@ module TSOS {
             }
 
         }
-        public delete() : void
+        public deleteChar() : void
         {
             //get new width
             var eraseWidth:number = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer.charAt(this.buffer.length - 1));

@@ -47,7 +47,7 @@ var TSOS;
                 }
                 else if (chr == String.fromCharCode(8)) //activate the delete function when backspace is pressed
                  {
-                    this["delete"]();
+                    this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
                 else {
@@ -103,7 +103,7 @@ var TSOS;
                 _DrawingContext.putImageData(lineMemory, 0, 0);
             }
         };
-        Console.prototype["delete"] = function () {
+        Console.prototype.deleteChar = function () {
             //get new width
             var eraseWidth = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer.charAt(this.buffer.length - 1));
             var yWidth = _DefaultFontSize + (2 * _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
