@@ -71,34 +71,34 @@ var TSOS;
             }
             else if ((keyCode >= 48) && (keyCode <= 57)) { //digits
                 if (isShifted) { //check if shift, if it is, setit to the symbol
-                    if (keyCode = 48) {
+                    if (keyCode == 48) {
                         chr = ")";
                     }
-                    else if (keyCode = 49) {
+                    else if (keyCode == 49) {
                         chr = "!";
                     }
-                    else if (keyCode = 50) {
+                    else if (keyCode == 50) {
                         chr = "@";
                     }
-                    else if (keyCode = 51) {
+                    else if (keyCode == 51) {
                         chr = "#";
                     }
-                    else if (keyCode = 52) {
+                    else if (keyCode == 52) {
                         chr = "$";
                     }
-                    else if (keyCode = 53) {
+                    else if (keyCode == 53) {
                         chr = "%";
                     }
-                    else if (keyCode = 54) {
+                    else if (keyCode == 54) {
                         chr = "^";
                     }
-                    else if (keyCode = 55) {
+                    else if (keyCode == 55) {
                         chr = "&";
                     }
-                    else if (keyCode = 56) {
+                    else if (keyCode == 56) {
                         chr = "*";
                     }
-                    else if (keyCode = 57) {
+                    else if (keyCode == 57) {
                         chr = "(";
                     }
                 }
