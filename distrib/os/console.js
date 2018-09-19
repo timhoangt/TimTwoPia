@@ -115,7 +115,8 @@ var TSOS;
         Console.prototype.BSOD = function (msg) {
             _DrawingContext.fillStyle = "blue"; //make the screen blue
             _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
-            _DrawingContext.drawText(this.currentFont, this.currentFontSize, 5, 20, "YA DONE GOOFED", "white"); //put text
+            _DrawingContext.drawText(this.currentFont, this.currentFontSize, 5, 20, "YA DONE GOOFED", "white"); //add text and error message
+            _DrawingContext.drawText(this.currentFont, this.currentFontSize, 5, 40, msg, "white");
         };
         return Console;
     }());
