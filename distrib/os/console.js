@@ -112,6 +112,10 @@ var TSOS;
             //destroy previous character
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
         };
+        Console.prototype.BSOD = function (msg) {
+            _DrawingContext.fillStyle = "blue";
+            _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+        };
         return Console;
     }());
     TSOS.Console = Console;

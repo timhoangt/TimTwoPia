@@ -124,6 +124,13 @@ module TSOS {
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
         }
 
+        public BSOD(msg:string) : void
+        {
+            _DrawingContext.fillStyle = "blue";
+            _DrawingContext.fillRect(0,0,_Canvas.width,_Canvas.height);
+         }
+
+
   
     }
 }
