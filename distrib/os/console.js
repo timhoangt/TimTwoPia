@@ -45,10 +45,14 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
-                else if (chr == String.fromCharCode(8)) //activate the delete function when backspace is pressed
+                else if (chr == String.fromCharCode(8)) //dont allow backspace
                  {
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                }
+                else if (chr == String.fromCharCode(9)) //dont tab
+                 {
+                    this.commandCompletion();
                 }
                 else {
                     // This is a "normal" character, so ...
