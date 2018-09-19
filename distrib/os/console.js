@@ -45,6 +45,11 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr == String.fromCharCode(8)) //activate the delete function when backspace is pressed
+                 {
+                    this["delete"]();
+                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -72,7 +77,7 @@ var TSOS;
                 this.currentXPosition = this.currentXPosition + offset;
             }
         };
-        Console.prototype.advanceLine = function () {
+        Console.prototype.nextLine = function () {
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -97,6 +102,15 @@ var TSOS;
                 //Reprint the data. 
                 _DrawingContext.putImageData(lineMemory, 0, 0);
             }
+        };
+        Console.prototype["delete"] = function () {
+            //get new width
+            var eraseWidth = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer.charAt(this.buffer.length - 1));
+            var yWidth = _DefaultFontSize + (2 * _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            //go backwards one
+            this.currentXPosition = this.currentXPosition - eraseWidth;
+            //destroy previous character
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
         };
         return Console;
     }());

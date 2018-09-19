@@ -128,7 +128,7 @@ module TSOS {
                                 chr = "\"";
                             }
                         }
-                            else if (keyCode == 186){
+                            else if (keyCode == 186){ //if not shifted, set it to normal symbol
                                 chr = ";";
                             }
                             else if (keyCode == 187){
@@ -162,10 +162,15 @@ module TSOS {
                                 chr = "'";
                             }
                         else {
-                            chr = String.fromCharCode(keyCode);
+                            chr = String.fromCharCode(keyCode); //use this for numbers so no long code
                         }
                         _KernelInputQueue.enqueue(chr);
                 }
+                else if( keyCode == 8 ) // backspace
+            {
+                chr = String.fromCharCode(8);;
+                _KernelInputQueue.enqueue(chr);
+            }
             }
         }
 }

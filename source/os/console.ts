@@ -45,7 +45,13 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else {
+                } 
+                else if( chr == String.fromCharCode(8)) //activate the delete function when backspace is pressed
+                {
+                    this.delete();
+                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                }
+                else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -74,7 +80,7 @@ module TSOS {
             }
          }
 
-        public advanceLine(): void {
+        public nextLine(): void {
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -107,5 +113,15 @@ module TSOS {
             }
 
         }
+        public delete() : void
+        {
+            //get new width
+            var eraseWidth:number = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer.charAt(this.buffer.length - 1));
+            var yWidth:number = _DefaultFontSize + (2 * _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            //go backwards one
+            this.currentXPosition = this.currentXPosition - eraseWidth;
+            //destroy previous character
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
+            }
     }
 }

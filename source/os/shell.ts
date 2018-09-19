@@ -159,12 +159,12 @@ module TSOS {
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
         public execute(fn, args?) {
             // We just got a command, so advance the line...
-            _StdOut.advanceLine();
+            _StdOut.nextLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
             fn(args);
             // Check to see if we need to advance the line again
             if (_StdOut.currentXPosition > 0) {
-                _StdOut.advanceLine();
+                _StdOut.nextLine();
             }
             // ... and finally write the prompt again.
             this.putPrompt();
@@ -207,7 +207,7 @@ module TSOS {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
-                _StdOut.advanceLine();
+                _StdOut.nextLine();
                 _StdOut.putText("must be the pride of [subject hometown here].");
             } else {
                 _StdOut.putText("Type 'help' for, well... help.");
@@ -216,7 +216,7 @@ module TSOS {
 
         public shellCurse() {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
-            _StdOut.advanceLine();
+            _StdOut.nextLine();
             _StdOut.putText("Bitch.");
             _SarcasticMode = true;
         }
@@ -224,7 +224,7 @@ module TSOS {
         public shellApology() {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
-              _StdOut.advanceLine();
+              _StdOut.nextLine();
               _StdOut.putText("For science . . . You monster.");
               _SarcasticMode = false;
            } else {
@@ -239,7 +239,7 @@ module TSOS {
         public shellHelp(args) {
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
-                _StdOut.advanceLine();
+                _StdOut.nextLine();
                 _StdOut.putText("  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description);
             }
         }
