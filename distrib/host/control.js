@@ -68,6 +68,13 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
+        Control.updateStatus = function (status) {
+            // Update status
+            this.status = status;
+            // Update status bar
+            var taStatus = document.getElementById("taStatus");
+            taStatus.value = status;
+        };
         Control.Time = function (msg, source) {
             /*var today = new Date();
             var h = today.getHours();

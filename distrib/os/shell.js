@@ -273,9 +273,10 @@ var TSOS;
             _StdOut.putText("You are in " + tzName);
         };
         Shell.prototype.shellStatus = function (args) {
-            if (args.length > 0) {
-                var status = args[0];
-            }
+            if (args.length > 0)
+                TSOS.Control.updateStatus(args.join(' '));
+            else
+                _StdOut.putText("Usage: status <string> - Please provide a string status message.");
         };
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {

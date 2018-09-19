@@ -122,6 +122,8 @@ module TSOS {
             this.currentXPosition = this.currentXPosition - eraseWidth;
             //destroy previous character
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
-            }
+        }
+
+  
     }
 }

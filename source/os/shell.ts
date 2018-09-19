@@ -329,10 +329,10 @@ module TSOS {
         }
 
         public shellStatus(args){
-            if (args.length > 0) {
-                var status = args[0];
-                
-            }
+            if( args.length > 0)
+                Control.updateStatus(args.join(' '));
+            else
+                _StdOut.putText("Usage: status <string> - Please provide a string status message.");
         }
 
         public shellPrompt(args) {
