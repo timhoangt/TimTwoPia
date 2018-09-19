@@ -105,6 +105,12 @@ module TSOS {
                                   "<string> - Updates the status on the console.");
             this.commandList[this.commandList.length] = sc;
 
+            // error
+            sc = new ShellCommand(this.shellError,
+                                  "error",
+                                  "Triggers an error for testing BSOD.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -341,6 +347,14 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        }
+
+        public shellError(args)
+        {
+            if( args.length > 0)
+                _Kernel.krnTrapError(args.join(' '));
+            else
+                _StdOut.putText("Usage: error <string> - Please supply a string.");
         }
     }
 }

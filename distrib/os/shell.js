@@ -62,6 +62,9 @@ var TSOS;
             // status
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Updates the status on the console.");
             this.commandList[this.commandList.length] = sc;
+            // error
+            sc = new TSOS.ShellCommand(this.shellError, "error", "Triggers an error for testing BSOD.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -285,6 +288,12 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        };
+        Shell.prototype.shellError = function (args) {
+            if (args.length > 0)
+                _Kernel.krnTrapError(args.join(' '));
+            else
+                _StdOut.putText("Usage: error <string> - Please supply a string.");
         };
         return Shell;
     }());
