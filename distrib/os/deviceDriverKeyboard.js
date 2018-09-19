@@ -60,14 +60,51 @@ var TSOS;
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (((keyCode >= 48) && (keyCode <= 57)) || // digits
-                (keyCode == 32) || // space
-                (keyCode == 188) || //comma
-                (keyCode == 190) || //period
-                // ((keyCode >= 186) && (keyCode <= 222))||   // punctuation and symbols
-                // ((keyCode >= 104) && (keyCode <= 111))||   // more symbols
-                (keyCode == 13)) { // enter
+            else if ((keyCode == 32) || // space
+                /*(keyCode == 188)                    ||  //comma
+                (keyCode == 190)                    ||  //period
+               ((keyCode >= 186) && (keyCode <= 222))||   // punctuation and symbols
+               ((keyCode >= 104) && (keyCode <= 111))||   // more symbols*/
+                (keyCode == 13)) { // enter 
                 chr = String.fromCharCode(keyCode);
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if ((keyCode >= 48) && (keyCode <= 57)) { //digits
+                if (isShifted) { //check if shift, if it is, setit to the symbol
+                    if (keyCode = 48) {
+                        chr = ")";
+                    }
+                    else if (keyCode = 49) {
+                        chr = "!";
+                    }
+                    else if (keyCode = 50) {
+                        chr = "@";
+                    }
+                    else if (keyCode = 51) {
+                        chr = "#";
+                    }
+                    else if (keyCode = 52) {
+                        chr = "$";
+                    }
+                    else if (keyCode = 53) {
+                        chr = "%";
+                    }
+                    else if (keyCode = 54) {
+                        chr = "^";
+                    }
+                    else if (keyCode = 55) {
+                        chr = "&";
+                    }
+                    else if (keyCode = 56) {
+                        chr = "*";
+                    }
+                    else if (keyCode = 57) {
+                        chr = "(";
+                    }
+                }
+                else {
+                    chr = String.fromCharCode(keyCode);
+                }
                 _KernelInputQueue.enqueue(chr);
             }
         };
