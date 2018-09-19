@@ -102,7 +102,7 @@ module TSOS {
             // status
             sc = new ShellCommand(this.shellStatus,
                                   "status",
-                                  "- Updates the status on the console.");
+                                  "<string> - Updates the status on the console.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
