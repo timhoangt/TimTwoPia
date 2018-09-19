@@ -63,7 +63,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Updates the status on the console.");
             this.commandList[this.commandList.length] = sc;
             // error
-            sc = new TSOS.ShellCommand(this.shellError, "error", "Triggers an error for testing BSOD.");
+            sc = new TSOS.ShellCommand(this.shellError, "error", "- Triggers an error for testing BSOD.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.

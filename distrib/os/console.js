@@ -113,8 +113,9 @@ var TSOS;
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
         };
         Console.prototype.BSOD = function (msg) {
-            _DrawingContext.fillStyle = "blue";
+            _DrawingContext.fillStyle = "blue"; //make the screen blue
             _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+            _DrawingContext.drawText(this.currentFont, this.currentFontSize, 5, 20, "YA DONE GOOFED", "white"); //put text
         };
         return Console;
     }());
