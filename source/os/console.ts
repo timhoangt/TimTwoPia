@@ -18,13 +18,24 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public cycle = 0, //where in the cycle you are
-                    public history: string[] = [],) { //your history memory
+                    public history = [], //storage for commands
+                    public cycle = -1,
+                    public cyclePosition = 0) //position in cycle
         }
 
         public init(): void {
             this.clearScreen();
             this.resetXY();
+            this.history[0] = ""; //adding 10 slots in the storage
+            this.history[1] = "";
+            this.history[2] = "";
+            this.history[3] = "";
+            this.history[4] = "";
+            this.history[5] = "";
+            this.history[6] = "";
+            this.history[7] = "";
+            this.history[8] = "";
+            this.history[9] = "";
         }
 
         private clearScreen(): void {
@@ -46,7 +57,7 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
-                    this.history.push(this.buffer); //add to command memory
+                    this.newHistory(this.buffer); //add to command memory
                     this.buffer = "";
                 } 
                 else if( chr == String.fromCharCode(8)) //dont allow backspace
@@ -56,38 +67,16 @@ module TSOS {
                 }
                 else if( chr == String.fromCharCode(9)) //dont tab
                 {
-                    this.deleteChar();
-                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
-                else if (chr == String.fromCharCode(38)) //up key
+                else if( chr == String.fromCharCode(38))
                 {
-                    if (this.cycle < this.history.length){ //add to history
-                        this.cycle ++; //move in cycle
-                        if(this.buffer !== ""){ //remove input line
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0){
-                                this.deleteChar(this.buffer[i]);
-                                i--;
-                            }
-                        }
-                    }
-                    this.putText(this.history[this.history.length-this.cycle]); //insert history command into input line
-                    this.buffer = this.history[this.history.length-this.cycle];
+                    this.getCyclePos(true);
                 }
-                else if (chr == String.fromCharCode(40)) { //down key
-                    if(this.cycle > 1){
-                        this.cycle--; //move in cycle
-                        if(this.buffer !== ""){ //remove input line
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0){
-                                this.deleteChar(this.buffer[i]); 
-                                i--;
-                            }
-                        }
-                        this.putText(this.history[this.history.length-this.cycle]); //insert history command into input line
-                        this.buffer = this.history[this.history.length-this.cycle];   
-                    }
-                }                  
+                else if( chr == String.fromCharCode(40))
+                {
+                    this.getCyclePos(false);
+                }
+                                  
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -179,7 +168,7 @@ module TSOS {
             var sc : ShellCommand = null;
             if (this.buffer == "")
               return;
-            for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
+            for (var i = 0; (i < _OsShell.commandList.length) && (match = false); i++) //this checks the commands
             {
                 sc = _OsShell.commandList[i];
                 if ( sc.command.search(this.buffer) == 0)
