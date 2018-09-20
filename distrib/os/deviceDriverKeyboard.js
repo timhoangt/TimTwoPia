@@ -186,8 +186,12 @@ var TSOS;
                 _KernelInputQueue.engueue(chr);
             }
             else if (keyCode == 38) { // up arrow
+                chr = String.fromCharCode(38);
+                _KernelInputQueue.enqueue(chr);
             }
             else if (keyCode == 40) { // down arrow
+                chr = String.fromCharCode(40);
+                _KernelInputQueue.enqueue(chr);
             }
         };
         return DeviceDriverKeyboard;

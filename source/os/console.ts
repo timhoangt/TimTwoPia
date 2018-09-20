@@ -17,7 +17,8 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    public history: string[] = []) {
         }
 
         public init(): void {
@@ -56,6 +57,28 @@ module TSOS {
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
+                else if (chr == String.fromCharCode(38)) //up key
+                {
+                    if(this.buffer != "")
+                    {
+                        var i = this.buffer.length - 1; //go back in history and clear command
+                        while (this.buffer.length > 0){
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                    this.putText(this.history[0]); //replace the command history
+                }
+                else if (chr == String.fromCharCode(40)) { //down key
+                    if(this.buffer != ""){
+                        var i = this.buffer.length - 1; //go forwards in history and clear command
+                        while (this.buffer.length > 0){
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                } 
+                    this.putText(this.prevCmd[0]);                     
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -116,6 +139,8 @@ module TSOS {
                 //Reprint the data. 
                 _DrawingContext.putImageData(lineMemory, 0, 0);
             }
+            //add to history
+            this.history.push(this.buffer); 
 
         }
         public deleteChar() : void

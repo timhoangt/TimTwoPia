@@ -10,17 +10,19 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, history) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (history === void 0) { history = []; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.history = history;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -55,7 +57,28 @@ var TSOS;
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
-                else {
+                else if (chr == String.fromCharCode(38)) //up key
+                 {
+                    if (this.buffer != "") {
+                        var i = this.buffer.length - 1; //go back in history and clear command
+                        while (this.buffer.length > 0) {
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                    this.putText(this.history[0]); //replace the command history
+                }
+                else if (chr == String.fromCharCode(40)) { //down key
+                    if (this.buffer != "") {
+                        var i = this.buffer.length - 1; //go forwards in history and clear command
+                        while (this.buffer.length > 0) {
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                }
+                this.putText(this.prevCmd[0]);
+                {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -107,6 +130,8 @@ var TSOS;
                 //Reprint the data. 
                 _DrawingContext.putImageData(lineMemory, 0, 0);
             }
+            //add to history
+            this.history.push(this.buffer);
         };
         Console.prototype.deleteChar = function () {
             //get new width
