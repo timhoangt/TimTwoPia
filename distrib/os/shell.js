@@ -300,12 +300,13 @@ var TSOS;
         };
         Shell.prototype.shellLoad = function (args) {
             var programInput = document.getElementById("taProgramInput").value;
-            if (programInput.length == 0)
-                _StdOut.putText("Type in program.");
-            else if (programInput.match("[a-f|A-F|0-9|]+"))
-                _StdOut.putText("Type in hex digit(s).");
-            else
-                _StdOut.putText("Program loaded.");
+            var input = /^[a-f\d\s]+$/i;
+            if (input.test(programInput)) {
+                _StdOut.putText("Your input is valid.");
+            }
+            else {
+                _StdOut.putText("Please enter a hex digit.");
+            }
         };
         return Shell;
     }());
