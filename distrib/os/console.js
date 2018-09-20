@@ -158,11 +158,26 @@ var TSOS;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
+                //get character length of input
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+                var overflow = "";
+                // will it go over the line?
+                while ((this.currentXPosition + offset) > _Canvas.width) {
+                    // store overflow text
+                    overflow = text.charAt(text.length - 1) + overflow;
+                    text = text.substr(0, text.length - 1);
+                    // draw non-overflow text
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                    // go down one line
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                    this.currentXPosition = this.currentXPosition + offset;
+                    //if there is overflow
+                    if (overflow.length > 0) {
+                        //write it on new line
+                        this.nextLine();
+                        this.putText(overflow);
+                    }
+                }
             }
         };
         Console.prototype.nextLine = function () {
