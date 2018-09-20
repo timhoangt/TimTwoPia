@@ -368,7 +368,7 @@ module TSOS {
             var programInput : string = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             var input = /^[a-f\d\s]+$/i;
             if (input.test(programInput)) {
-                _StdOut.putText("Your input is valid.");
+                _StdOut.putText("Your program has been loaded");
             }
             else {
                 _StdOut.putText("Please enter a hex digit.");
