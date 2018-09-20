@@ -10,18 +10,21 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, history) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, cycle, //where in the cycle you are
+        history) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (cycle === void 0) { cycle = 0; }
             if (history === void 0) { history = []; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.cycle = cycle;
             this.history = history;
         }
         Console.prototype.init = function () {
@@ -45,6 +48,7 @@ var TSOS;
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
+                    this.history.push(this.buffer); //add to command memory
                     this.buffer = "";
                 }
                 else if (chr == String.fromCharCode(8)) //dont allow backspace
@@ -59,26 +63,34 @@ var TSOS;
                 }
                 else if (chr == String.fromCharCode(38)) //up key
                  {
-                    if (this.buffer != "") {
-                        var i = this.buffer.length - 1; //go back in history and clear command
-                        while (this.buffer.length > 0) {
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                    if (this.cycle < this.history.length) { //add to history
+                        this.cycle++; //move in cycle
+                        if (this.buffer !== "") { //remove input line
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0) {
+                                this.deleteChar(this.buffer[i]);
+                                i--;
+                            }
                         }
                     }
-                    this.putText(this.history[0]); //replace the command history
+                    this.putText(this.history[this.history.length - this.cycle]); //insert history command into input line
+                    this.buffer = this.history[this.history.length - this.cycle];
                 }
                 else if (chr == String.fromCharCode(40)) { //down key
-                    if (this.buffer != "") {
-                        var i = this.buffer.length - 1; //go forwards in history and clear command
-                        while (this.buffer.length > 0) {
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                    if (this.cycle > 1) {
+                        this.cycle--; //move in cycle
+                        if (this.buffer !== "") { //remove input line
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0) {
+                                this.deleteChar(this.buffer[i]);
+                                i--;
+                            }
                         }
+                        this.putText(this.history[this.history.length - this.cycle]); //insert history command into input line
+                        this.buffer = this.history[this.history.length - this.cycle];
                     }
                 }
-                this.putText(this.prevCmd[0]);
-                {
+                else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);

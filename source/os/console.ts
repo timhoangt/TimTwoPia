@@ -18,7 +18,8 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public history: string[] = []) {
+                    public cycle = 0, //where in the cycle you are
+                    public history: string[] = [],) { //your history memory
         }
 
         public init(): void {
@@ -45,6 +46,7 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
+                    this.history.push(this.buffer); //add to command memory
                     this.buffer = "";
                 } 
                 else if( chr == String.fromCharCode(8)) //dont allow backspace
@@ -59,26 +61,33 @@ module TSOS {
                 }
                 else if (chr == String.fromCharCode(38)) //up key
                 {
-                    if(this.buffer != "")
-                    {
-                        var i = this.buffer.length - 1; //go back in history and clear command
-                        while (this.buffer.length > 0){
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                    if (this.cycle < this.history.length){ //add to history
+                        this.cycle ++; //move in cycle
+                        if(this.buffer !== ""){ //remove input line
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0){
+                                this.deleteChar(this.buffer[i]);
+                                i--;
+                            }
                         }
                     }
-                    this.putText(this.history[0]); //replace the command history
+                    this.putText(this.history[this.history.length-this.cycle]); //insert history command into input line
+                    this.buffer = this.history[this.history.length-this.cycle];
                 }
                 else if (chr == String.fromCharCode(40)) { //down key
-                    if(this.buffer != ""){
-                        var i = this.buffer.length - 1; //go forwards in history and clear command
-                        while (this.buffer.length > 0){
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                    if(this.cycle > 1){
+                        this.cycle--; //move in cycle
+                        if(this.buffer !== ""){ //remove input line
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0){
+                                this.deleteChar(this.buffer[i]); 
+                                i--;
+                            }
                         }
+                        this.putText(this.history[this.history.length-this.cycle]); //insert history command into input line
+                        this.buffer = this.history[this.history.length-this.cycle];   
                     }
-                } 
-                    this.putText(this.prevCmd[0]);                     
+                }                  
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
