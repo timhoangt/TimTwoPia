@@ -157,7 +157,7 @@
             this.buffer = "";
         }
  
-         public putText(text): void {
+         public putText(text : String): void {
              // My first inclination here was to write two functions: putChar() and putString().
              // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
              // between the two.  So rather than be like PHP and write two (or more) functions that
@@ -166,7 +166,7 @@
              //
              // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
              //         Consider fixing that.
-             if (text !== "") {
+            if (text !== "") {
                 //get character length of input
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 var overflow : String = "";
@@ -176,24 +176,24 @@
                     // store overflow text
                     overflow = text.charAt(text.length - 1) + overflow;
                     text = text.substr(0,text.length - 1);
-
-                    // draw non-overflow text
-                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
                     
                     // go down one line
                     var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                    this.currentXPosition = this.currentXPosition + offset;
 
-                    //if there is overflow
-                    if( overflow.length > 0)
-                    {
-                        //write it on new line
-                        this.nextLine();
-                        this.putText(overflow);
-                    }
                 }
-             }
-          }
+
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                this.currentXPosition = this.currentXPosition + offset;
+
+                //if there is overflow
+                if( overflow.length > 0)
+                {
+                    //write it on new line
+                    this.nextLine();
+                    this.putText(overflow);
+                }
+            }
+        }
  
          public nextLine(): void {
              this.currentXPosition = 0;
