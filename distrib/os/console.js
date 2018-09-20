@@ -74,10 +74,12 @@ var TSOS;
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
-                else if (chr == String.fromCharCode(38)) {
+                else if (chr == String.fromCharCode(38)) //up arrow to go up in cycle
+                 {
                     this.GetCyclePos(true);
                 }
-                else if (chr == String.fromCharCode(40)) {
+                else if (chr == String.fromCharCode(40)) //down arrow to go down in cycle
+                 {
                     this.GetCyclePos(false);
                 }
                 else {

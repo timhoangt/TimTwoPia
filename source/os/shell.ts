@@ -111,6 +111,12 @@ module TSOS {
                                   "<string> - Triggers an error for testing BSOD.");
             this.commandList[this.commandList.length] = sc;
 
+            // load
+            sc = new ShellCommand(this.shellLoad,
+                "load",
+                "<hex digit(s)> - Loads and validates use code.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -356,5 +362,16 @@ module TSOS {
             else
                 _StdOut.putText("Usage: error <string> - Please supply a string.");
         }
+
+        public shellLoad(args)
+        {
+            var programInput : string = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+             if( programInput.length == 0 )
+                _StdOut.putText("Type in hex digit(s)")
+            else if( programInput.match("[^a-f|A-F|0-9| ]+") )
+                _StdOut.putText("Type in hex digit(s)");
+            else
+                _StdOut.putText("Program loaded.");
+         }
     }
 }
