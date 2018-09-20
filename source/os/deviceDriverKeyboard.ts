@@ -176,10 +176,10 @@ module TSOS {
                     _KernelInputQueue.engueue(chr);
                 }
                 else if( keyCode == 38 ){ // up arrow
-
+                    _KernelInputQueue.enqueue(chr);
                 }
                 else if( keyCode == 40 ){ // down arrow
-
+                    _KernelInputQueue.enqueue(chr);
                 }
             }
         }

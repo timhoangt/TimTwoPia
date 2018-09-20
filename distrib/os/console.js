@@ -10,21 +10,38 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, history, //storage of commands
+        cycle, cyclePos) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (history === void 0) { history = []; }
+            if (cycle === void 0) { cycle = -1; }
+            if (cyclePos === void 0) { cyclePos = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.history = history;
+            this.cycle = cycle;
+            this.cyclePos = cyclePos;
         }
         Console.prototype.init = function () {
             this.clearScreen();
             this.resetXY();
+            this.history[0] = "NULL"; //creating ten storage slots for memory
+            this.history[1] = "NULL";
+            this.history[2] = "NULL";
+            this.history[3] = "NULL";
+            this.history[4] = "NULL";
+            this.history[5] = "NULL";
+            this.history[6] = "NULL";
+            this.history[7] = "NULL";
+            this.history[8] = "NULL";
+            this.history[9] = "NULL";
         };
         Console.prototype.clearScreen = function () {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
@@ -42,6 +59,8 @@ var TSOS;
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    //add whatever you entered to the memory
+                    this.HistoryNew(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
@@ -55,6 +74,12 @@ var TSOS;
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
+                else if (chr == String.fromCharCode(38)) {
+                    this.GetCyclePos(true);
+                }
+                else if (chr == String.fromCharCode(40)) {
+                    this.GetCyclePos(false);
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -64,6 +89,62 @@ var TSOS;
                 }
                 // TODO: Write a case for Ctrl-C.
             }
+        };
+        Console.prototype.removeLastCharInQueue = function () {
+            //get rid of last buffer
+            this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+        };
+        //go through the cycle depending on wether you want to go up or down
+        Console.prototype.GetCyclePos = function (moveUp) {
+            var match = false;
+            var posList = this.cyclePos;
+            var newPos = 0;
+            if (moveUp) //did you press up arrow?
+             {
+                do {
+                    if (this.history[this.cyclePos] != "NULL") //check for null
+                     {
+                        match = true;
+                        newPos = this.cyclePos;
+                    }
+                    this.cyclePos--;
+                    // place new cmd if matching
+                    if (this.cyclePos < 0)
+                        this.cyclePos = 9;
+                } while ((this.cyclePos != posList) && !match);
+            }
+            else {
+                // go through commands
+                do {
+                    if (this.history[this.cyclePos] != "NULL") {
+                        match = true;
+                        newPos = this.cyclePos;
+                    }
+                    this.cyclePos++;
+                    if (this.cyclePos > 9)
+                        this.cyclePos = 0;
+                } while ((this.cyclePos != posList) && !match);
+            }
+            // Check if matching
+            if (match) {
+                this.ClearPrompt();
+                this.buffer = this.history[newPos];
+                this.putText(this.history[newPos]);
+            }
+        };
+        Console.prototype.HistoryNew = function (cmd) {
+            this.cycle++;
+            if (this.cycle > 9) //check if you need to overwrite memory
+                this.cycle = 0;
+            this.cyclePos = this.cycle;
+            this.history[this.cycle] = cmd;
+        };
+        Console.prototype.ClearPrompt = function () {
+            var eraseWidth = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer);
+            var yWidth = _DefaultFontSize + (2 * _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            this.currentXPosition -= eraseWidth;
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
+            this.buffer = "";
         };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().

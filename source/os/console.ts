@@ -17,12 +17,25 @@
                      public currentFontSize = _DefaultFontSize,
                      public currentXPosition = 0,
                      public currentYPosition = _DefaultFontSize,
-                     public buffer = "") {
+                     public buffer = "",
+                     public history = [], //storage of commands
+                     public cycle = -1,
+                     public cyclePos = 0) { //position in storage
          }
  
          public init(): void {
              this.clearScreen();
              this.resetXY();
+             this.history[0] = "NULL"; //creating ten storage slots for memory
+             this.history[1] = "NULL";
+             this.history[2] = "NULL";
+             this.history[3] = "NULL";
+             this.history[4] = "NULL";
+             this.history[5] = "NULL";
+             this.history[6] = "NULL";
+             this.history[7] = "NULL";
+             this.history[8] = "NULL";
+             this.history[9] = "NULL";
          }
  
          private clearScreen(): void {
@@ -43,6 +56,8 @@
                      // The enter key marks the end of a console command, so ...
                      // ... tell the shell ...
                      _OsShell.handleInput(this.buffer);
+                    //add whatever you entered to the memory
+                    this.HistoryNew(this.buffer);
                      // ... and reset our buffer.
                      this.buffer = "";
                  } 
@@ -56,6 +71,14 @@
                     this.deleteChar();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                 }
+                else if( chr == String.fromCharCode(38))
+                {
+                    this.GetCyclePos(true);
+                }
+                else if( chr == String.fromCharCode(40))
+                {
+                    this.GetCyclePos(false);
+                }
                 else {
                     // This is a "normal" character, so ...
                      // ... draw it on the screen...
@@ -66,6 +89,73 @@
                  // TODO: Write a case for Ctrl-C.
              }
          }
+
+        public removeLastCharInQueue() : void{
+            //get rid of last buffer
+            this.buffer = this.buffer.substr(0,this.buffer.length - 1);
+        }
+        
+        //go through the cycle depending on wether you want to go up or down
+        public GetCyclePos(moveUp : boolean) : void
+        {
+            var match : boolean = false;
+            var posList : number = this.cyclePos;
+            var newPos : number = 0;
+            if( moveUp ) //did you press up arrow?
+            {
+                do{
+                    if( this.history[this.cyclePos] != "NULL") //check for null
+                    {
+                        match = true;
+                        newPos = this.cyclePos;
+                    }
+                    this.cyclePos--;
+                     // place new cmd if matching
+                    if (this.cyclePos < 0)
+                        this.cyclePos = 9;
+                 }while( (this.cyclePos != posList) && !match);
+             }
+
+            else
+            {
+                // go through commands
+                do{
+                    if( this.history[this.cyclePos] != "NULL")
+                    {
+                        match = true;
+                        newPos = this.cyclePos;
+                    }
+                    this.cyclePos++;
+                    if (this.cyclePos > 9)
+                        this.cyclePos = 0;
+                 }while( (this.cyclePos != posList) && !match);
+            }
+             // Check if matching
+            if( match )
+            {
+                this.ClearPrompt();
+                this.buffer = this.history[newPos];
+                this.putText(this.history[newPos]);
+            }
+        }
+
+        public HistoryNew( cmd : string) : void
+        {
+            this.cycle++;
+            if( this.cycle > 9) //check if you need to overwrite memory
+            this.cycle = 0;
+            this.cyclePos = this.cycle;
+            this.history[this.cycle] = cmd;
+        }
+
+        public ClearPrompt() : void
+        {
+            var eraseWidth:number = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer);
+            var yWidth:number = _DefaultFontSize + (2 * _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            this.currentXPosition -= eraseWidth;
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, eraseWidth, yWidth);
+            this.buffer = "";
+        }
  
          public putText(text): void {
              // My first inclination here was to write two functions: putChar() and putString().
