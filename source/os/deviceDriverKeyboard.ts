@@ -172,6 +172,8 @@ module TSOS {
                 }
                 else if( keyCode == 9){ // tab
                     _Console.commandCompletion();
+                    chr = String.fromCharCode(9);
+                    _KernelInputQueue.engueue(chr);
                 }
                 else if( keyCode == 38 ){ // up arrow
 

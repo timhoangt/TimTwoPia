@@ -130,14 +130,13 @@ var TSOS;
             var sc = null;
             if (this.buffer == "")
                 return;
-            for (var i = 0; (i < _OsShell.commandList.length) && (match = false); i++) //this checks the commands
-                for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
-                 {
-                    sc = _OsShell.commandList[i];
-                    if (sc.command.search(this.buffer) == 0) {
-                        match = true;
-                    }
+            for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
+             {
+                sc = _OsShell.commandList[i];
+                if (sc.command.search(this.buffer) == 0) {
+                    match = true;
                 }
+            }
             if (match) //when match is true, replace the text
              {
                 this.putText(sc.command.substr(this.buffer.length));

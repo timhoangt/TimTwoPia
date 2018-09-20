@@ -145,7 +145,6 @@
             var sc : ShellCommand = null;
             if (this.buffer == "")
               return;
-            for (var i = 0; (i < _OsShell.commandList.length) && (match = false); i++) //this checks the commands
             for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
             {
                 sc = _OsShell.commandList[i];
