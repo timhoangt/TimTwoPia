@@ -66,7 +66,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellError, "error", "<string> - Triggers an error for testing BSOD.");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<hex digit(s)> - Loads and validates use code.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<hex digit(s)> - Loads and validates user code.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -301,9 +301,9 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             var programInput = document.getElementById("taProgramInput").value;
             if (programInput.length == 0)
-                _StdOut.putText("Type in hex digit(s)");
-            else if (programInput.match("[^a-f|A-F|0-9| ]+"))
-                _StdOut.putText("Type in hex digit(s)");
+                _StdOut.putText("Type in program.");
+            else if (programInput.match("[a-f|A-F|0-9|]+"))
+                _StdOut.putText("Type in hex digit(s).");
             else
                 _StdOut.putText("Program loaded.");
         };

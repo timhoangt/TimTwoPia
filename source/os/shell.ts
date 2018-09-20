@@ -113,8 +113,8 @@ module TSOS {
 
             // load
             sc = new ShellCommand(this.shellLoad,
-                "load",
-                "<hex digit(s)> - Loads and validates use code.");
+                                  "load",
+                                  "<hex digit(s)> - Loads and validates user code.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -366,10 +366,10 @@ module TSOS {
         public shellLoad(args)
         {
             var programInput : string = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
-             if( programInput.length == 0 )
-                _StdOut.putText("Type in hex digit(s)")
-            else if( programInput.match("[^a-f|A-F|0-9| ]+") )
-                _StdOut.putText("Type in hex digit(s)");
+            if( programInput.length == 0 )
+                _StdOut.putText("Type in program.")
+            else if( programInput.match("[a-f|A-F|0-9|]+") )
+                _StdOut.putText("Type in hex digit(s).");
             else
                 _StdOut.putText("Program loaded.");
          }
