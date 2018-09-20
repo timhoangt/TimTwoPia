@@ -108,7 +108,7 @@ module TSOS {
             // error
             sc = new ShellCommand(this.shellError,
                                   "error",
-                                  "- Triggers an error for testing BSOD.");
+                                  "<string> - Triggers an error for testing BSOD.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
