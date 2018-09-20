@@ -301,7 +301,7 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             var programInput = document.getElementById("taProgramInput").value;
             var input = /^[a-f\d\s]+$/i; //hex digit filter
-            if (input.test(programInput)) { //test if test matches hex digit
+            if (input.test(programInput)) { //test if text matches hex digit
                 _StdOut.putText("Your program has been loaded"); //if it does match
             }
             else {
