@@ -135,7 +135,6 @@ var TSOS;
         Kernel.prototype.krnCreateProcess = function (pBase) {
             var pid = _ResidentQueue.getSize();
             var process = new TSOS.Process(pid, pBase);
-            console.log(process);
             _ResidentQueue.enqueue(process);
             return pid;
         };

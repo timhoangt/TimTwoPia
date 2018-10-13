@@ -68,6 +68,9 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "<hex digit(s)> - Loads and validates user code.");
             this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process according to their pID.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -224,6 +227,10 @@ var TSOS;
                     case "cls":
                         _StdOut.putText("Cls resets the screen and cursor position.");
                         break;
+                    // run <pid>
+                    case "run":
+                        _StdOut.putText("Runs the process with pID <pID>.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -312,6 +319,20 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please enter a hex digit."); //if it doesnt match
+            }
+        };
+        Shell.prototype.shellRun = function (args) {
+            var input = /^\d*$/;
+            if (input.test(args) && args != "") {
+                if (_ResidentQueue.isEmpty()) {
+                    _StdOut.putText("Nothing is loaded in memory.");
+                }
+                else {
+                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                }
+            }
+            else {
+                _StdOut.putText("Please enter a valid pID.");
             }
         };
         return Shell;

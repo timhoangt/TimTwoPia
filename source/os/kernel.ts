@@ -151,7 +151,6 @@ module TSOS {
         public krnCreateProcess(pBase) {
             var pid = _ResidentQueue.getSize();
             var process = new Process(pid, pBase);
-            console.log(process);
             _ResidentQueue.enqueue(process);
             return pid;
         }
