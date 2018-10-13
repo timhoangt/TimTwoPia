@@ -302,15 +302,13 @@ var TSOS;
             var programInput = document.getElementById("taProgramInput").value;
             var input = /^[a-f\d\s]+$/i; //hex digit filter
             if (input.test(programInput)) { //test if text matches hex digit
-                _StdOut.putText("Your program has been loaded"); //if it does match
-                var loadText = programInput.split(" ");
-                console.log(loadText);
-                for (var i = 0; i < loadText.length; i++) {
-                    _Memory.memoryBox[i] = loadText[i];
-                    console.log("i = " + i);
-                }
-                console.log(_Memory.memoryBox);
-                _Memory.createTable(_Memory.memoryBox);
+                _StdOut.putText("Your program has been loaded."); //if it does match
+                var pBase = _MemoryManager.loadOpCodes(programInput);
+                var pid = _Kernel.krnCreateProcess(pBase);
+                _StdOut.putText(" Process id: " + pid + " is in Resident Queue.");
+            }
+            else if (programInput == "") {
+                _StdOut.putText("Please enter 6502a op codes in the input area below.");
             }
             else {
                 _StdOut.putText("Please enter a hex digit."); //if it doesnt match

@@ -1,5 +1,6 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="pcb.ts" />
 
 /* ------------
      Kernel.ts
@@ -27,6 +28,8 @@ module TSOS {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
+            _ResidentQueue = new Queue();
+            _ReadyQueue = new Queue();
 
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
@@ -41,6 +44,7 @@ module TSOS {
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            _MemoryManager = new MemoryManager();
 
             //
             // ... more?
@@ -144,6 +148,13 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
+        public krnCreateProcess(pBase) {
+            var pid = _ResidentQueue.getSize();
+            var process = new Process(pid, pBase);
+            console.log(process);
+            _ResidentQueue.enqueue(process);
+            return pid;
+        }
         // - ExitProcess
         // - WaitForProcessToExit
         // - CreateFile
