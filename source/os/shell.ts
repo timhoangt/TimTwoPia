@@ -369,6 +369,14 @@ module TSOS {
             var input = /^[a-f\d\s]+$/i; //hex digit filter
             if (input.test(programInput)) { //test if text matches hex digit
                 _StdOut.putText("Your program has been loaded"); //if it does match
+                var loadText: string[] = programInput.split(" ");
+                console.log(loadText);
+                for (var i = 0; i <loadText.length; i++){
+                    _Memory.memoryBox[i] = loadText[i];
+                    console.log("i = " + i);
+                }
+                console.log(_Memory.memoryBox);
+                _Memory.createTable(_Memory.memoryBox);
             }
             else {
                 _StdOut.putText("Please enter a hex digit."); //if it doesnt match

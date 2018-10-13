@@ -43,44 +43,6 @@ var TSOS;
             // TODO: Acculate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
         };
-        Cpu.prototype.fetch = function (PC) {
-            return _RAM.RAM[PC];
-        };
-        Cpu.prototype.run = function (opCode) {
-            if (opCode.length > 0) {
-                var data;
-                var address;
-                //match with OPcodes
-                switch (opCode) {
-                    //LDA, Load the Acculator with a constant 
-                    case "A9":
-                        this.PC++;
-                        data = parseInt(this.fetch(this.PC), 16);
-                        this.Acc = data;
-                        this.PC++;
-                        break;
-                    //LDA, Load the Acculator from memory 
-                    case "AD":
-                        this.PC++;
-                        address = this.fetch(this.PC);
-                        this.PC++;
-                        address = this.fetch(this.PC) + address;
-                        var index = parseInt(address, 16);
-                        data = parseInt(this.fetch(index), 16);
-                        this.Acc = data;
-                        this.PC++;
-                    //STA, store Acculator in memory
-                    case "8D":
-                        data = this.Acc;
-                        this.PC++;
-                        address = this.fetch(this.PC);
-                        this.PC++;
-                        address = this.fetch(this.PC) + address;
-                        this.PC++;
-                        break;
-                }
-            }
-        };
         return Cpu;
     }());
     TSOS.Cpu = Cpu;

@@ -140,6 +140,8 @@ module TSOS {
         // Host Events
         //
         public static hostBtnStartOS_click(btn): void {
+
+
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
@@ -153,12 +155,15 @@ module TSOS {
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
-
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+
+            // ... Create and initialize the Memory
+            _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _Memory.init();  
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -169,6 +174,7 @@ module TSOS {
             // Stop the interval that's simulating our clock pulse.
             clearInterval(_hardwareClockID);
             // TODO: Is there anything else we need to do here?
+
         }
 
         public static hostBtnReset_click(btn): void {

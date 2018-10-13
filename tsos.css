@@ -1,15 +1,16 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/linen.png) repeat;
+  background: black;
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
+  color:lime;
 }
 
 h1 {
-  color: black;
+  color: lime;
   font-size: 24pt;
   font-weight: normal;
   font-style: normal;
@@ -17,7 +18,7 @@ h1 {
 }
 
 h2 {
-  color: black;
+  color: lime;
   font-size: 20pt;
   font-weight: normal;
   font-style: normal;
@@ -28,21 +29,94 @@ h3 {
   font-size: 16pt;
   font-weight: normal;
   font-style: normal;
+  color:lime;
 }
 
 #display {
-  background-color:#DFDBC3;
-  border: 2px solid red;
+  background-color: white;
+  border: 2px solid white;
   cursor: default;
+  color: lime;
 }
 
 .normal_button {
   width: 100px;
+  color:lime;
+  background-color: black;
 }
 
 .footerText {
-  color: black;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
+}
+
+.tableContainer {
+  width: 287px;
+  height: 149px;
+  border: 2px solid white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: nowrap;
+  background-color: black;
+}
+
+#taHostLog{
+  color: lime;
+  font-weight: normal;
+  width: 100%; 
+  border-collapse: collapse;
+  border: 2px solid white;
+  background-color: black; 
+}
+
+#taProgramInput{
+  color: lime;
+  font-weight: normal;
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid white;
+  background-color: black; 
+}
+
+#taTime{
+  color: lime;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
+  border: 2px solid white;
+  background-color: black; 
+}
+
+#taStatus{
+  color: lime;
+  font-weight: normal;
+  width: 283px;
+  text-align: center;  
+  border-collapse: collapse;
+  border: 2px solid white;
+  background-color: black; 
+}
+
+#cpuContainer {
+  width: 287px;  
+  height: 50px;
+  border: 2px solid white;
+  background-color: black;  
+}
+
+#taMemory{
+  color:lime;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+}
+
+#taCPU{
+  color: lime;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
 }

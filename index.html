@@ -15,6 +15,7 @@
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -27,11 +28,13 @@
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
+   <script type="text/javascript" src="distrib/os/pcb.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script>
+   <!--<script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/ glados-ip1.js"></script>-->
    
 </head>
 
@@ -67,7 +70,8 @@
              onclick="TSOS.Control.hostBtnReset_click(this);">
    </div>
 
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+   <div id="divConsole" style="margin:4px; width:0px; height:500px; float:left; ">
+    Console
       <canvas id="display"
               width="500px"
               height="500px"
@@ -75,7 +79,7 @@
       </canvas>
    </div>
 
-   <div id="divLog" style="margin-left:520px;">
+   <div id="divLog" style="margin-left:520px; float:left;">
       <label>
          Host Log
          <br>
@@ -87,7 +91,7 @@
       </label>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
+   <div id="divUserProgramInput" style="margin-left:520px; float:left;">
       <label>
          User Program Input
          <br>
@@ -118,60 +122,89 @@
     }
     </script>
 
-   <div id="divTime" style="margin-left:520px;">
+   <div id="divTime" style="margin-left:520px; float:left;">
       <label>
          Time
          <br>
          <textarea name="taTime"
-                   id  ="taTime"
+                   id="taTime"
                    rows="1"
                    cols="48"
          ></textarea>
       </label>
    </div>
 
-   <div id="divStatus" style="margin-left:520px;">
+   <div id="divStatus" style="margin-left:850px;">
       <label>
          Status
          <br>
          <textarea name="taStatus"
-                   id  ="taStatus"
+                   id="taStatus"
                    rows="5"
                    cols="48"
          ></textarea>
       </label>
    </div>
 
-   <div id="divRAM" style="margin-left:1000px;">
+   <div id="divMemory" style="margin-left:850px;" >
       <label>
-          RAM
-          <br>
-          <textarea name="taRAM"
-                     id  ="taRAM"
-                     rows="20"
-                     cols="48"
-          ></textarea>
-       </label>
+        Memory
+        <br>
+        <div class="tableContainer" id="memoryContainer">
+        </div>
+      </label>
    </div>
-   <div id="divPcb" style="margin-left:1000px;">
-        <label>
-            PCB
-            <br>
-            <textarea name="taPcb"
-                      id  ="taPcb"
-                      rows="5"
-                      cols="48"
-            ></textarea>
-        </label>
-    </div>
-</div>
+
+   <div id="divPcb" style="margin-left:850px;">
+      <label>
+        Process Control Box
+        <br>
+        <div class="tableContainer" id="pcbContainer">
+        </div>
+    </label>
+   </div>
+
+   <div id="divCPU" style="margin-left:850px;">
+    <label>
+      CPU 
+      <br>
+      <div id="cpuContainer">
+        <table name = "taCPU"
+               id = "taCPU">
+          <thead>
+            <tr>
+              <th> PC </th>
+              <th> IR </th>
+              <th> ACC </th>
+              <th> X </th>
+              <th> Y </th>
+              <th> Z </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td> 0 </td>
+              <td> 0 </td>
+              <td> 0 </td>
+              <td> 0 </td>
+              <td> 0 </td>
+              <td> 0 </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>                
+    </label>
+  </div>
+
 
 <p class="footerText" style="clear:both;">
+   <font color="lime">
    <br>
    Copyright &copy; 2008 - 2016 No Rights Reserved.
    <br>
    Reproduction is inhibited without the express written consent of
    Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+   </font>
 </p>
 
 </body>
