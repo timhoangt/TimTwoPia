@@ -2,7 +2,7 @@ var TSOS;
 (function (TSOS) {
     var Process = /** @class */ (function () {
         function Process(pid, pBase) {
-            this.pCounter = 0;
+            this.pCounter = 0; //points to instructions
             this.pAcc = 0;
             this.pXreg = 0;
             this.pYreg = 0;
