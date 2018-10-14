@@ -378,10 +378,16 @@ module TSOS {
             var programInput : string = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
             var input = /^[a-f\d\s]+$/i; //hex digit filter
             if (input.test(programInput)) { //test if text matches hex digit
-                _StdOut.putText("Your program has been loaded."); //if it does match
-                var pBase: number = _MemoryManager.loadOpCodes(programInput);
-                var pid: number = _Kernel.krnCreateProcess(pBase);
-                _StdOut.putText(" Process id: " + pid + " is in Resident Queue.");
+                _StdOut.putText("Your program has been loaded. "); //if it does match
+                var inputOpCodes: string[] = programInput.split(" "); 
+                var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
+                if (pBase == 999){
+                    _StdOut.putText("Memory is full. Please wait to load");                    
+                } 
+                else {
+                    var pid: number = _Kernel.krnCreateProcess(pBase);
+                    _StdOut.putText("Process id: " + pid + " is in resident queue");
+                }
             }
             else if(programInput == ""){
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
@@ -399,6 +405,7 @@ module TSOS {
                 } 
                 else {
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                    _CPU.isExecuting = true;
                 }
             } 
             else {

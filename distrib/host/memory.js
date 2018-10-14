@@ -33,16 +33,19 @@ var TSOS;
                 var row = document.createElement("tr");
                 row.id = "memoryRow-" + (8 * i);
                 var cell = document.createElement("td");
-                var cellText = document.createTextNode("0x" + (8 * i));
-                cell.id = "byte" + (8 * i);
+                var val = 8 * i;
+                var hexVal = "000" + val.toString(16).toUpperCase();
+                var cellText = document.createTextNode(hexVal.slice(-4));
+                cell.id = "byte" + hexVal.slice(-4);
                 cell.appendChild(cellText);
                 row.appendChild(cell);
                 for (var j = 0; j < 8; j++) {
                     cell = document.createElement("td");
                     var index = j + (8 * i);
+                    var id = "000" + index.toString(16).toUpperCase();
                     var memoryValue = this.memory[index];
                     cellText = document.createTextNode(memoryValue);
-                    cell.id = "memoryCell-" + index;
+                    cell.id = id.slice(-4);
                     cell.appendChild(cellText);
                     row.appendChild(cell);
                 }
@@ -61,7 +64,8 @@ var TSOS;
                 rowId = "memoryRow-" + (8 * i);
                 for (var j = 0; j < 8; j++) {
                     index = j + (8 * i);
-                    cellId = "memoryCell-" + index;
+                    var id = "000" + index.toString(16).toUpperCase();
+                    cellId = id.slice(-4);
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = this.memory[index];
                 }
             }

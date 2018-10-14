@@ -8,24 +8,10 @@ var TSOS;
     var MemoryManager = /** @class */ (function () {
         function MemoryManager() {
         }
-        MemoryManager.prototype.loadOpCodes = function (programInput) {
-            var inputOpCodes = programInput.split(" ");
+        MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
-            var limitReg;
             if (_Memory.memoryP1) { //assigns three partitions with a set amount of space
-                if (_Memory.memoryP2) {
-                    if (_Memory.memoryP3) {
-                        _StdOut.putText(" Memory is full. Wait until more is available."); //error if you used all three partitions
-                    }
-                    else {
-                        _Memory.memoryP3 = true;
-                        baseReg = 512;
-                    }
-                }
-                else {
-                    _Memory.memoryP2 = true;
-                    baseReg = 256;
-                }
+                baseReg = 999;
             }
             else {
                 _Memory.memoryP1 = true;
@@ -36,6 +22,25 @@ var TSOS;
             }
             _Memory.updateTable(baseReg); //updates table
             return baseReg;
+        };
+        MemoryManager.prototype.readMemory = function (pBase, pLimit) {
+            var opCode = [];
+            for (var i = pBase; i <= pLimit; i++) {
+                opCode.push(_Memory.memory[i]);
+            }
+            return opCode;
+        };
+        MemoryManager.prototype.updateMemory = function (addr, data) {
+            var index = parseInt(addr, 16);
+            _Memory.memory[index] = data.toString(16);
+            _Memory.updateTable(0);
+        };
+        MemoryManager.prototype.clearPartition = function (pBase) {
+            for (var i = pBase; i <= pBase + 255; i++) {
+                _Memory.memory[i] = "00";
+            }
+            _Memory.memoryP1 = false;
+            _Memory.updateTable(pBase);
         };
         return MemoryManager;
     }());

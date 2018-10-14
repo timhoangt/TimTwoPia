@@ -120,3 +120,11 @@ h3 {
   text-align: center;  
   border-collapse: collapse;
 }
+
+#taProcess{
+  color: lime;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
+}

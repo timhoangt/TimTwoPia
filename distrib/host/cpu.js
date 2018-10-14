@@ -38,10 +38,162 @@ var TSOS;
             this.Zflag = 0;
             this.isExecuting = false;
         };
+        Cpu.prototype.updateCPU = function () {
+            var cpuTable = document.getElementById("taCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = this.Zflag.toString();
+        };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
-            // TODO: Acculate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
+            if (this.PC == 0) {
+                _PCB = _ReadyQueue.dequeue();
+                _PCB.pState = "Running";
+                this.PC = _PCB.pBase;
+            }
+            var opCode = this.fetch(this.PC);
+            this.decodeExecute(opCode);
+            this.updateCPU();
+        };
+        Cpu.prototype.fetch = function (PC) {
+            return _Memory.memory[PC];
+        };
+        Cpu.prototype.decodeExecute = function (opCode) {
+            if (opCode.length > 0) {
+                var data;
+                var addr;
+                switch (opCode) {
+                    case "A9":
+                        data = parseInt(this.fetch(this.PC + 1), 16);
+                        this.Acc = data;
+                        this.PC += 2;
+                        break;
+                    case "AD":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index), 16);
+                        this.Acc = data;
+                        this.PC += 3;
+                        break;
+                    case "8D":
+                        data = this.Acc;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        _MemoryManager.updateMemory(addr, data);
+                        this.PC += 3;
+                        break;
+                    case "6D":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index), 16);
+                        this.Acc = data + this.Acc;
+                        this.PC += 3;
+                        break;
+                    case "A2":
+                        data = parseInt(this.fetch(this.PC + 1), 16);
+                        this.Xreg = data;
+                        this.PC += 2;
+                        break;
+                    case "AE":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index));
+                        this.Xreg = data;
+                        this.PC += 3;
+                        break;
+                    case "A0":
+                        data = parseInt(this.fetch(this.PC + 1), 16);
+                        this.Yreg = data;
+                        this.PC += 2;
+                        break;
+                    case "AC":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index));
+                        this.Yreg = data;
+                        this.PC += 3;
+                        break;
+                    case "EA":
+                        this.PC++;
+                        break;
+                    case "00":
+                        _Kernel.krnExitProcess();
+                        this.init();
+                        this.updateCPU();
+                        break;
+                    case "EC":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index), 16);
+                        if (data == this.Xreg) {
+                            this.Zflag = 1;
+                        }
+                        else {
+                            this.Zflag = 0;
+                        }
+                        this.PC += 3;
+                        break;
+                    case "D0":
+                        if (this.Zflag == 0) {
+                            var branch = parseInt(this.fetch(this.PC + 1), 16) + this.PC;
+                            if (branch < _PCB.pLimit) {
+                                this.PC = branch;
+                            }
+                            else {
+                                branch = branch % 256;
+                                this.PC = branch;
+                            }
+                            this.PC += 2;
+                        }
+                        else {
+                            this.PC += 2;
+                        }
+                        break;
+                    case "EE":
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index), 16);
+                        data++;
+                        _MemoryManager.updateMemory(addr, data);
+                        this.PC += 3;
+                        break;
+                    case "FF":
+                        var str = "";
+                        if (this.Xreg == 1) {
+                            str = this.Yreg.toString();
+                        }
+                        else if (this.Xreg == 2) {
+                            addr = this.Yreg.toString(16);
+                            var index = parseInt(addr, 16);
+                            data = parseInt(this.fetch(index), 16);
+                            var chr = String.fromCharCode(data);
+                            while (data != 0) {
+                                str = str + chr;
+                                index++;
+                                data = parseInt(this.fetch(index), 16);
+                                chr = String.fromCharCode(data);
+                            }
+                        }
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_IRQ, str));
+                        this.PC++;
+                        break;
+                    default:
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, opCode));
+                        _Kernel.krnExitProcess();
+                        this.init();
+                        this.updateCPU();
+                        break;
+                }
+            }
         };
         return Cpu;
     }());

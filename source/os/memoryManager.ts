@@ -5,24 +5,10 @@ Requires global.ts.
 ------------ */
 module TSOS {
 export class MemoryManager {
-     public loadOpCodes(programInput){
-        var inputOpCodes: string[] = programInput.split(" ");               
+     public loadMemory(inputOpCodes){           
         var baseReg: number;
-        var limitReg: number;
         if (_Memory.memoryP1){ //assigns three partitions with a set amount of space
-            if(_Memory.memoryP2){
-                if(_Memory.memoryP3){
-                    _StdOut.putText(" Memory is full. Wait until more is available."); //error if you used all three partitions
-                }
-                else{
-                	_Memory.memoryP3 = true;
-                    baseReg = 512;
-                }
-            }
-            else{
-                _Memory.memoryP2 = true; 
-                baseReg = 256;
-            }
+            baseReg = 999;
         }
         else{
             _Memory.memoryP1 = true;
@@ -33,6 +19,28 @@ export class MemoryManager {
         }
         _Memory.updateTable(baseReg); //updates table
         return baseReg;
-    }   
+    }
+
+    public readMemory(pBase, pLimit){
+        var opCode: string[] = [];
+        for (var i = pBase; i <= pLimit; i ++){
+            opCode.push(_Memory.memory[i]);
+        }
+        return opCode;
+    }
+
+    public updateMemory(addr, data) : void{
+        var index: number = parseInt(addr, 16);                 
+        _Memory.memory[index] = data.toString(16);
+        _Memory.updateTable(0);
+    }
+
+    public clearPartition(pBase) : void{
+        for (var i = pBase; i <= pBase+255; i++){
+            _Memory.memory[i] = "00";
+        }
+        _Memory.memoryP1 = false;
+        _Memory.updateTable(pBase);
+    }
 }
 } 

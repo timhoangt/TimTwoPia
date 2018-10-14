@@ -42,6 +42,7 @@ var TSOS;
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             _MemoryManager = new TSOS.MemoryManager();
+            _PCB = new TSOS.PCB(0);
             //
             // ... more?
             //
@@ -117,13 +118,28 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case PROGRAMERROR_IRQ:
+                    this.programError(params);
+                    break;
+                case PRINT_IRQ:
+                    this.print(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
         };
+        Kernel.prototype.print = function (chr) {
+            _StdOut.putText(chr);
+        };
         Kernel.prototype.krnTimerISR = function () {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+        };
+        Kernel.prototype.programError = function (opCode) {
+            // When user program entry is not a valid op ocde
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
         };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
@@ -133,12 +149,16 @@ var TSOS;
         // - WriteConsole
         // - CreateProcess
         Kernel.prototype.krnCreateProcess = function (pBase) {
-            var pid = _ResidentQueue.getSize();
-            var process = new TSOS.Process(pid, pBase);
-            _ResidentQueue.enqueue(process);
+            _PCB = new TSOS.PCB(pBase);
+            var pid = _PCB.getPid();
+            _ResidentQueue.enqueue(_PCB);
             return pid;
         };
         // - ExitProcess
+        Kernel.prototype.krnExitProcess = function () {
+            var pBase = _PCB.getPBase();
+            _MemoryManager.clearPartition(pBase);
+        };
         // - WaitForProcessToExit
         // - CreateFile
         // - OpenFile
