@@ -87,7 +87,7 @@ var TSOS;
                     _CPU.cycle();
                 }
                 else {
-                    TSOS.Control.hostBtnNext_onOff();
+                    TSOS.Control.hostBtnNextStep_onOff();
                 }
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle. {

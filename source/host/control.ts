@@ -343,31 +343,31 @@ module TSOS {
             if (_SingleStep){
                 btn.style.backgroundColor = "lime";
                 btn.style.color = "black";
-                this.hostBtnNext_onOff();      
+                this.hostBtnNextStep_onOff();      
             }
             else {
-                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
+                (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = true;
                 btn.style.backgroundColor = "black";
                 btn.style.color = "lime";
             }         
         }
 
-        public static hostBtnNext_click(btn): void {
+        public static hostBtnNextStep_click(btn): void {
             if(_CPU.isExecuting){
                 _CPU.cycle();
             }
         }
 
-        public static hostBtnNext_onOff(): void {
+        public static hostBtnNextStep_onOff(): void {
             if(_CPU.isExecuting){
-                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;
-                document.getElementById("btnNext").style.backgroundColor = "lime";
-                document.getElementById("btnNext").style.color = "black";        
+                (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = false;
+                document.getElementById("btnNextStep").style.backgroundColor = "lime";
+                document.getElementById("btnNextStep").style.color = "black";        
             }
             else {
-                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
-                document.getElementById("btnNext").style.backgroundColor = "black";
-                document.getElementById("btnNext").style.color = "lime";               
+                (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = true;
+                document.getElementById("btnNextStep").style.backgroundColor = "black";
+                document.getElementById("btnNextStep").style.color = "lime";               
             }
         }
     }

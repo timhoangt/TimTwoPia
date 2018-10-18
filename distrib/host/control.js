@@ -293,29 +293,29 @@ var TSOS;
             if (_SingleStep) {
                 btn.style.backgroundColor = "lime";
                 btn.style.color = "black";
-                this.hostBtnNext_onOff();
+                this.hostBtnNextStep_onOff();
             }
             else {
-                document.getElementById("btnNext").disabled = true;
+                document.getElementById("btnNextStep").disabled = true;
                 btn.style.backgroundColor = "black";
                 btn.style.color = "lime";
             }
         };
-        Control.hostBtnNext_click = function (btn) {
+        Control.hostBtnNextStep_click = function (btn) {
             if (_CPU.isExecuting) {
                 _CPU.cycle();
             }
         };
-        Control.hostBtnNext_onOff = function () {
+        Control.hostBtnNextStep_onOff = function () {
             if (_CPU.isExecuting) {
-                document.getElementById("btnNext").disabled = false;
-                document.getElementById("btnNext").style.backgroundColor = "lime";
-                document.getElementById("btnNext").style.color = "black";
+                document.getElementById("btnNextStep").disabled = false;
+                document.getElementById("btnNextStep").style.backgroundColor = "lime";
+                document.getElementById("btnNextStep").style.color = "black";
             }
             else {
-                document.getElementById("btnNext").disabled = true;
-                document.getElementById("btnNext").style.backgroundColor = "black";
-                document.getElementById("btnNext").style.color = "lime";
+                document.getElementById("btnNextStep").disabled = true;
+                document.getElementById("btnNextStep").style.backgroundColor = "black";
+                document.getElementById("btnNextStep").style.color = "lime";
             }
         };
         return Control;

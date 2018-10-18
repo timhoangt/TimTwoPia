@@ -98,7 +98,7 @@ module TSOS {
                     _CPU.cycle();
                 }
                 else {
-                    Control.hostBtnNext_onOff();
+                    Control.hostBtnNextStep_onOff();
                 }
             }
             else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
