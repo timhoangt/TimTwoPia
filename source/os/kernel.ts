@@ -168,7 +168,9 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid);
+            //status of program to ready
             _ResidentQueue.enqueue(process);
+            //updates process table
             Control.addProcessTable(process);
             return pid;
         }

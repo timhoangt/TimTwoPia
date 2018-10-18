@@ -84,17 +84,21 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        //loaded after startup
         public static loadMemoryTable(): void {
             var memoryContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("memoryContainer");
             var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
             memoryTable.className = "taMemory";
             memoryTable.id = "taMemory";
             var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            //enough space for 12 bytes
             for (var i = 0; i < 96; i++){
+                //one byte rows being made
                 var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
                 row.id = "memoryRow-" + (8*i);
                 var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
                 var val: number = 8*i;
+                //writing values of each inital bit
                 var hexVal: string = "000" + val.toString(16).toUpperCase();
                 var cellText = document.createTextNode(hexVal.slice(-4));
                 cell.id = "byte" + hexVal.slice(-4);
@@ -116,6 +120,7 @@ module TSOS {
             memoryContainer.appendChild(memoryTable);
         }
 
+        //loaded at each load command
         public static updateMemoryTable(baseReg): void {
             var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taMemory");
             var rowId: string;
@@ -126,6 +131,7 @@ module TSOS {
                 rowId = "memoryRow-" + (8*i);
                 for (var j = 0; j < 8; j ++){
                     index = j + (8 * i);
+                    //writing values of each loaded bit
                     var id: string = "000" + index.toString(16).toUpperCase();                            
                     cellId = id.slice(-4);                            
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
@@ -133,13 +139,16 @@ module TSOS {
             }
         }
 
+        //runs on load
         public static addProcessTable(process): void {
+            //adds new process to the table
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");         
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
             cell.id = process.id;
 
+            //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -153,6 +162,7 @@ module TSOS {
             cellText = document.createTextNode("0");
             cell.appendChild(cellText);
             row.appendChild(cell);
+
 
             cell = document.createElement("td");            
             cellText = document.createTextNode(process.pAcc);
@@ -189,6 +199,7 @@ module TSOS {
         public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row = processTableBody.rows.item(0);
+            //updates PC, IR, ACC, X, Y, Z, State
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
             row.cells.item(3).innerHTML = pAcc;
@@ -199,12 +210,15 @@ module TSOS {
         }
 
         public static removeProcessTable(): void{
+            //after program is complete, table is cleared
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");
             processTableBody.deleteRow(0);
         }
 
+        //continuously runs when process is running
         public static updateCPU(cpu): void {
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
+            //updates values in CPU table
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
@@ -235,6 +249,8 @@ module TSOS {
             var h: number = today.getHours();
             var m: number = today.getMinutes();
             var s: number = today.getSeconds();
+
+            //adds 0 in front of value if minute or second value is less than 10
             if (m < 10 && s > 10) {
                 var str: string = h + ":0" + m + ":" + s;
                 var taTime = <HTMLInputElement> document.getElementById("taTime");
@@ -278,6 +294,8 @@ module TSOS {
             // .. enable the Halt and Reset buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+
+            //enables single step button
             (<HTMLButtonElement>document.getElementById("btnSingleStep")).disabled = false; 
 
             // .. set focus on the OS console display ...

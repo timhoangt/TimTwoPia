@@ -7,13 +7,16 @@ module TSOS {
     export class MemoryManager {
          public loadMemory(inputOpCodes){           
             var baseReg: number;
+            //gives id of empty partition
             if (_Memory.memoryP1){
+                //fills partition
                 baseReg = 999;
             }
             else{
                 _Memory.memoryP1 = true;
                 baseReg = 0;
             }
+            //puts program in the partition
             for (var i = baseReg; i <inputOpCodes.length; i++){
                 _Memory.memory[i] = inputOpCodes[i]; //program is put in the memory partition
             }
@@ -21,6 +24,7 @@ module TSOS {
             return baseReg;
         }
 
+        //gets the memory
         public readMemory(index){
             var opCode: string = _Memory.memory[index];
             return opCode;
@@ -32,6 +36,7 @@ module TSOS {
             Control.updateMemoryTable(0);
         }
 
+        //once executed, empties partition
         public clearPartition(baseReg) : void{
             for (var i = baseReg; i <= baseReg+255; i++){
                 _Memory.memory[i] = "00";
