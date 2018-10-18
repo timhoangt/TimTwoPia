@@ -3,7 +3,7 @@ var TSOS;
     var PCB = /** @class */ (function () {
         function PCB(pBase, pid) {
             this.pCounter = 0; //points to instructions
-            this.pIR = "00";
+            //public pIR: string = "00";
             this.pAcc = 0;
             this.pXreg = 0;
             this.pYreg = 0;

@@ -32,6 +32,7 @@ var TSOS;
             this.Zflag = Zflag;
             this.isExecuting = isExecuting;
         }
+        //initializes all values we need for CPU
         Cpu.prototype.init = function () {
             this.PC = 0;
             this.IR = "00";
@@ -46,12 +47,16 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.PC == 0) {
+                //starts runnning process
                 var process = _ReadyQueue.dequeue();
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
+            //matches opCode with instruction
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
-            this.decodeExecute(opCode);
+            //calls upon execution function
+            this.decodeExecute(this.IR);
+            //calls upon an update to the CPU and process tables
             TSOS.Control.updateCPU(this);
             if (this.isExecuting) {
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
@@ -60,17 +65,20 @@ var TSOS;
         Cpu.prototype.fetch = function (PC) {
             return _MemoryManager.readMemory(PC);
         };
+        //Executes op codes
         Cpu.prototype.decodeExecute = function (opCode) {
             if (opCode.length > 0) {
                 var data;
                 var addr;
                 var index;
                 switch (opCode) {
+                    //Load the accumulator with a constant
                     case "A9":
                         data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Acc = data;
                         this.PC += 2;
                         break;
+                    //Load the accumulator from memory
                     case "AD":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -78,12 +86,14 @@ var TSOS;
                         this.Acc = data;
                         this.PC += 3;
                         break;
+                    //Store the accumulator in memory
                     case "8D":
                         data = this.Acc;
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         _MemoryManager.updateMemory(addr, data);
                         this.PC += 3;
                         break;
+                    //Add with carry
                     case "6D":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -91,11 +101,13 @@ var TSOS;
                         this.Acc = data + this.Acc;
                         this.PC += 3;
                         break;
+                    //Load the X register with a constant
                     case "A2":
                         data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Xreg = data;
                         this.PC += 2;
                         break;
+                    //Load the X register from memory
                     case "AE":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -103,11 +115,13 @@ var TSOS;
                         this.Xreg = data;
                         this.PC += 3;
                         break;
+                    //Load the Y register with a constant
                     case "A0":
                         data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Yreg = data;
                         this.PC += 2;
                         break;
+                    //Load the Y register from memory
                     case "AC":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -115,14 +129,17 @@ var TSOS;
                         this.Yreg = data;
                         this.PC += 3;
                         break;
+                    //no operation
                     case "EA":
                         this.PC++;
                         break;
+                    //Break (which is really a system call) 
                     case "00":
                         _Kernel.krnExitProcess();
                         this.init();
                         TSOS.Control.updateCPU(this);
                         break;
+                    //Compare a byte in memory to the X reg 
                     case "EC":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -135,6 +152,7 @@ var TSOS;
                         }
                         this.PC += 3;
                         break;
+                    //Branch n bytes if Z flag = 0
                     case "D0":
                         if (this.Zflag == 0) {
                             var branch = parseInt(this.fetch(this.PC + 1), 16) + this.PC;
@@ -150,6 +168,7 @@ var TSOS;
                             this.PC += 2;
                         }
                         break;
+                    //Increment the value of a byte 
                     case "EE":
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
@@ -158,6 +177,7 @@ var TSOS;
                         _MemoryManager.updateMemory(addr, data);
                         this.PC += 3;
                         break;
+                    //System Call
                     case "FF":
                         var str = "";
                         if (this.Xreg == 1) {
@@ -175,6 +195,7 @@ var TSOS;
                                 chr = String.fromCharCode(data);
                             }
                         }
+                        //prints through kernel
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_IRQ, str));
                         this.PC++;
                         break;
@@ -182,6 +203,7 @@ var TSOS;
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
+                        //updates CPU table
                         TSOS.Control.updateCPU(this);
                         break;
                 }

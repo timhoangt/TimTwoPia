@@ -83,7 +83,12 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                _CPU.cycle();
+                if (!_SingleStep) {
+                    _CPU.cycle();
+                }
+                else {
+                    TSOS.Control.hostBtnNext_onOff();
+                }
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
@@ -152,9 +157,15 @@ var TSOS;
             _PID++;
             var pid = _PID;
             var process = new TSOS.PCB(pBase, pid);
+            //status of program to ready
             _ResidentQueue.enqueue(process);
+            //updates process table
             TSOS.Control.addProcessTable(process);
             return pid;
+        };
+        Kernel.prototype.krnExecuteProcess = function () {
+            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            _CPU.isExecuting = true;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {

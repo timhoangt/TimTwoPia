@@ -53,7 +53,7 @@ module TSOS {
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
             //calls upon execution function
-            this.decodeExecute(opCode);
+            this.decodeExecute(this.IR);
             //calls upon an update to the CPU and process tables
             Control.updateCPU(this);
             if(this.isExecuting){

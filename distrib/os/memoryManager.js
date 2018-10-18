@@ -10,19 +10,23 @@ var TSOS;
         }
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
+            //gives id of empty partition
             if (_Memory.memoryP1) {
+                //fills partition
                 baseReg = 999;
             }
             else {
                 _Memory.memoryP1 = true;
                 baseReg = 0;
             }
+            //puts program in the partition
             for (var i = baseReg; i < inputOpCodes.length; i++) {
                 _Memory.memory[i] = inputOpCodes[i]; //program is put in the memory partition
             }
             TSOS.Control.updateMemoryTable(baseReg); //updates table
             return baseReg;
         };
+        //gets the memory
         MemoryManager.prototype.readMemory = function (index) {
             var opCode = _Memory.memory[index];
             return opCode;
@@ -32,6 +36,7 @@ var TSOS;
             _Memory.memory[index] = data.toString(16);
             TSOS.Control.updateMemoryTable(0);
         };
+        //once executed, empties partition
         MemoryManager.prototype.clearPartition = function (baseReg) {
             for (var i = baseReg; i <= baseReg + 255; i++) {
                 _Memory.memory[i] = "00";

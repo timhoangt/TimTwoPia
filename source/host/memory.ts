@@ -11,8 +11,8 @@ module TSOS {
 
     //see if partition has content
     public memoryP1: boolean = false;
-    //public memoryP2: boolean = false;
-    //public memoryP3: boolean = false;
+    public memoryP2: boolean = false;
+    public memoryP3: boolean = false;
 
     //initializes memory
     public init(): void {
@@ -23,8 +23,8 @@ module TSOS {
       
       //shows which partitions exist
       this.memoryP1 = false;
-      //this.memoryP2 = false;
-      //this.memoryP3 = false;
+      this.memoryP2 = false;
+      this.memoryP3 = false;
 
       Control.loadMemoryTable();
     }

@@ -2,7 +2,7 @@ module TSOS {
     export class PCB { //pcb
         public pid: number; //gets pID
         public pCounter: number = 0; //points to instructions
-        public pIR: string = "00";
+        //public pIR: string = "00";
         public pAcc: number = 0;
         public pXreg: number = 0;
         public pYreg: number = 0;

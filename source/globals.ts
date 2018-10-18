@@ -30,6 +30,7 @@ const PRINT_IRQ: number = 3;
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _Memory: TSOS.Memory;
 var _MemoryManager: TSOS.MemoryManager;
+var _MemoryAccessor: TSOS.MemoryAccessor;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -51,6 +52,7 @@ var _KernelError: boolean = false;  // initilizing to false.
 var _ResidentQueue;
 var _ReadyQueue;
 var _PID: number = -1;
+var _SingleStep = false;
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.
 var _StdOut;

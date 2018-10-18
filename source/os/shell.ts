@@ -413,8 +413,7 @@ module TSOS {
                     _StdOut.putText("No pID " + args + " exists.");
                 }
                 else {
-                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    _CPU.isExecuting = true;
+                    _Kernel.krnExecuteProcess();
                 }
             }
             else {

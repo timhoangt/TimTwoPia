@@ -68,17 +68,21 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
+        //loaded after startup
         Control.loadMemoryTable = function () {
             var memoryContainer = document.getElementById("memoryContainer");
             var memoryTable = document.createElement("table");
             memoryTable.className = "taMemory";
             memoryTable.id = "taMemory";
             var memoryTableBody = document.createElement("tbody");
+            //enough space for 12 bytes
             for (var i = 0; i < 96; i++) {
+                //one byte rows being made
                 var row = document.createElement("tr");
                 row.id = "memoryRow-" + (8 * i);
                 var cell = document.createElement("td");
                 var val = 8 * i;
+                //writing values of each inital bit
                 var hexVal = "000" + val.toString(16).toUpperCase();
                 var cellText = document.createTextNode(hexVal.slice(-4));
                 cell.id = "byte" + hexVal.slice(-4);
@@ -99,6 +103,7 @@ var TSOS;
             memoryTable.appendChild(memoryTableBody);
             memoryContainer.appendChild(memoryTable);
         };
+        //loaded at each load command
         Control.updateMemoryTable = function (baseReg) {
             var memoryTable = document.getElementById("taMemory");
             var rowId;
@@ -109,18 +114,22 @@ var TSOS;
                 rowId = "memoryRow-" + (8 * i);
                 for (var j = 0; j < 8; j++) {
                     index = j + (8 * i);
+                    //writing values of each loaded bit
                     var id = "000" + index.toString(16).toUpperCase();
                     cellId = id.slice(-4);
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
                 }
             }
         };
+        //runs on load
         Control.addProcessTable = function (process) {
+            //adds new process to the table
             var processTableBody = document.getElementById("processTbody");
             var row = document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell = document.createElement("td");
             cell.id = process.id;
+            //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -161,6 +170,7 @@ var TSOS;
         Control.updateProcessTable = function (pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
             var processTableBody = document.getElementById("processTbody");
             var row = processTableBody.rows.item(0);
+            //updates PC, IR, ACC, X, Y, Z, State
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
             row.cells.item(3).innerHTML = pAcc;
@@ -170,11 +180,14 @@ var TSOS;
             row.cells.item(7).innerHTML = "Running";
         };
         Control.removeProcessTable = function () {
+            //after program is complete, table is cleared
             var processTableBody = document.getElementById("processTbody");
             processTableBody.deleteRow(0);
         };
+        //continuously runs when process is running
         Control.updateCPU = function (cpu) {
             var cpuTable = document.getElementById("taCPU");
+            //updates values in CPU table
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();
@@ -201,6 +214,7 @@ var TSOS;
             var h = today.getHours();
             var m = today.getMinutes();
             var s = today.getSeconds();
+            //adds 0 in front of value if minute or second value is less than 10
             if (m < 10 && s > 10) {
                 var str = h + ":0" + m + ":" + s;
                 var taTime = document.getElementById("taTime");
@@ -239,6 +253,7 @@ var TSOS;
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            //enables single step button
             document.getElementById("btnSingleStep").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -250,6 +265,9 @@ var TSOS;
             // ... Create and initialize the Memory
             _Memory = new TSOS.Memory(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();
+            //initialize memory accessor
+            _MemoryAccessor = new TSOS.MemoryAccessor();
+            _MemoryAccessor.init();
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
@@ -271,9 +289,34 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
         Control.hostBtnSingle_click = function (btn) {
-            document.getElementById("btnNext").disabled = false;
+            _SingleStep = !(_SingleStep);
+            if (_SingleStep) {
+                btn.style.backgroundColor = "lime";
+                btn.style.color = "black";
+                this.hostBtnNext_onOff();
+            }
+            else {
+                document.getElementById("btnNext").disabled = true;
+                btn.style.backgroundColor = "black";
+                btn.style.color = "lime";
+            }
         };
         Control.hostBtnNext_click = function (btn) {
+            if (_CPU.isExecuting) {
+                _CPU.cycle();
+            }
+        };
+        Control.hostBtnNext_onOff = function () {
+            if (_CPU.isExecuting) {
+                document.getElementById("btnNext").disabled = false;
+                document.getElementById("btnNext").style.backgroundColor = "lime";
+                document.getElementById("btnNext").style.color = "black";
+            }
+            else {
+                document.getElementById("btnNext").disabled = true;
+                document.getElementById("btnNext").style.backgroundColor = "black";
+                document.getElementById("btnNext").style.color = "lime";
+            }
         };
         return Control;
     }());

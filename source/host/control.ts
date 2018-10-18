@@ -308,7 +308,11 @@ module TSOS {
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // ... Create and initialize the Memory
             _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _Memory.init();  
+            _Memory.init();
+
+            //initialize memory accessor
+            _MemoryAccessor = new MemoryAccessor();
+            _MemoryAccessor.init();
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
@@ -335,11 +339,36 @@ module TSOS {
         }
 
         public static hostBtnSingle_click(btn): void {
-            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;           
+            _SingleStep = !(_SingleStep);
+            if (_SingleStep){
+                btn.style.backgroundColor = "lime";
+                btn.style.color = "black";
+                this.hostBtnNext_onOff();      
+            }
+            else {
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
+                btn.style.backgroundColor = "black";
+                btn.style.color = "lime";
+            }         
         }
 
         public static hostBtnNext_click(btn): void {
-            
+            if(_CPU.isExecuting){
+                _CPU.cycle();
+            }
+        }
+
+        public static hostBtnNext_onOff(): void {
+            if(_CPU.isExecuting){
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;
+                document.getElementById("btnNext").style.backgroundColor = "lime";
+                document.getElementById("btnNext").style.color = "black";        
+            }
+            else {
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
+                document.getElementById("btnNext").style.backgroundColor = "black";
+                document.getElementById("btnNext").style.color = "lime";               
+            }
         }
     }
 }
