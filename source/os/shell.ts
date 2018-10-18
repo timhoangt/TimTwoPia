@@ -376,17 +376,22 @@ module TSOS {
         public shellLoad(args)
         {
             var programInput : string = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+            programInput = programInput.replace(/(\r\n|\n|\r)/gm,""); 
             var input = /^[a-f\d\s]+$/i; //hex digit filter
             if (input.test(programInput)) { //test if text matches hex digit
-                _StdOut.putText("Your program has been loaded. "); //if it does match
-                var inputOpCodes: string[] = programInput.split(" "); 
-                var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
-                if (pBase == 999){
-                    _StdOut.putText("Memory is full. Please wait to load");                    
+                var inputOpCodes: string[] = programInput.split(" ");
+                if (inputOpCodes.length > 256){
+                    _StdOut.putText("Not enough memory for this program.");                    
                 } 
                 else {
-                    var pid: number = _Kernel.krnCreateProcess(pBase);
-                    _StdOut.putText("Process id: " + pid + " is in resident queue");
+                    var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
+                    if (baseReg == 999){
+                        _StdOut.putText("Memory is full.");                    
+                    }
+                    else {
+                        var pid: number = _Kernel.krnCreateProcess(baseReg);
+                        _StdOut.putText("pID " + pid + " is in resident Queue");
+                    }
                 }
             }
             else if(programInput == ""){
@@ -402,12 +407,15 @@ module TSOS {
             if (input.test(args) && args != ""){
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("Nothing is loaded in memory.");
-                } 
+                }
+                else if(args!=_PID) {
+                    _StdOut.putText("No pID " + args + " exists.");
+                }
                 else {
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
                     _CPU.isExecuting = true;
                 }
-            } 
+            }
             else {
                 _StdOut.putText("Please enter a valid pID.");
             }  

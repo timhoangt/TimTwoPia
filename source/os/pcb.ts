@@ -1,7 +1,8 @@
 module TSOS {
     export class PCB { //pcb
-        public pid: number = -1; //gets pID
+        public pid: number; //gets pID
         public pCounter: number = 0; //points to instructions
+        public pIR: string = "00";
         public pAcc: number = 0;
         public pXreg: number = 0;
         public pYreg: number = 0;
@@ -10,22 +11,13 @@ module TSOS {
         public pState: string = "New";
         public pLocation: string = "Memory";
         public pBase: number;
-        public pLimit: number = 256;
+        public pLimit: number;
 
-        constructor(pBase) { //assigns values to process
+        constructor(pBase, pid) { //assigns values to process
             this.pBase = pBase;
-            this.pid++;
+            this.pid = pid;
             this.pState = "Resident";
-        }
-
-        public getPid() {
-            return this.pid;
-        }
-        public getPBase() {
-            return this.pBase;
-        }
-         public getPLimit() {
-            return this.pLimit;
+            this.pLimit = pBase + 255;
         }
     }
 } 

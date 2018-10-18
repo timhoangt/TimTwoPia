@@ -83,15 +83,145 @@ module TSOS {
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
-            public static msg : string;
 
-            public static updateStatus(msg : string ) : void {
-                // Update status
-                this.msg = msg;
-                 // Update status bar
-                var taStatus = <HTMLInputElement> document.getElementById("taStatus");
-                taStatus.value = msg;
+        public static loadMemoryTable(): void {
+            var memoryContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("memoryContainer");
+            var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
+            memoryTable.className = "taMemory";
+            memoryTable.id = "taMemory";
+            var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            for (var i = 0; i < 96; i++){
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+                row.id = "memoryRow-" + (8*i);
+                var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+                var val: number = 8*i;
+                var hexVal: string = "000" + val.toString(16).toUpperCase();
+                var cellText = document.createTextNode(hexVal.slice(-4));
+                cell.id = "byte" + hexVal.slice(-4);
+                cell.appendChild(cellText);
+                row.appendChild(cell);        
+                for (var j = 0; j < 8; j++) {
+                    cell = document.createElement("td");
+                    var index: number = j + (8 * i);
+                    var id: string = "000" + index.toString(16).toUpperCase();
+                    var memoryValue: string = _Memory.memory[index];
+                    cellText = document.createTextNode(memoryValue);
+                    cell.id = id.slice(-4);
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
                 }
+                memoryTableBody.appendChild(row);
+            }
+            memoryTable.appendChild(memoryTableBody);
+            memoryContainer.appendChild(memoryTable);
+        }
+
+        public static updateMemoryTable(baseReg): void {
+            var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taMemory");
+            var rowId: string;
+            var index: number;                    
+            var cellId: string;
+            var limitReg: number = baseReg + 256;
+            for (var i = baseReg; i < limitReg/8 ; i++){
+                rowId = "memoryRow-" + (8*i);
+                for (var j = 0; j < 8; j ++){
+                    index = j + (8 * i);
+                    var id: string = "000" + index.toString(16).toUpperCase();                            
+                    cellId = id.slice(-4);                            
+                    memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
+                }
+            }
+        }
+
+        public static addProcessTable(process): void {
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");         
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+            row.id = "pid" + process.pid;
+            var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+            cell.id = process.id;
+
+            var cellText = document.createTextNode(process.pid);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pCounter);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode("0");
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pAcc);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pXreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pYreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pZflag);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pState);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pLocation);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            processTableBody.appendChild(row);
+        } 
+
+        public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
+            var row = processTableBody.rows.item(0);
+            row.cells.item(1).innerHTML = pCounter;
+            row.cells.item(2).innerHTML = pIR;
+            row.cells.item(3).innerHTML = pAcc;
+            row.cells.item(4).innerHTML = pXreg;
+            row.cells.item(5).innerHTML = pYreg;
+            row.cells.item(6).innerHTML = pZflag;
+            row.cells.item(7).innerHTML = "Running";
+        }
+
+        public static removeProcessTable(): void{
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");
+            processTableBody.deleteRow(0);
+        }
+
+        public static updateCPU(cpu): void {
+            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();                        
+        } 
+
+        public static msg : string;
+
+        public static updateStatus(msg : string ) : void {
+            // Update status
+            this.msg = msg;
+             // Update status bar
+            var taStatus = <HTMLInputElement> document.getElementById("taStatus");
+            taStatus.value = msg;
+            }
 
         public static Time(msg: string, source: string = "?"): void {
             /*var today = new Date();
@@ -148,6 +278,7 @@ module TSOS {
             // .. enable the Halt and Reset buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("btnSingleStep")).disabled = false; 
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -183,6 +314,14 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        public static hostBtnSingle_click(btn): void {
+            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;           
+        }
+
+        public static hostBtnNext_click(btn): void {
+            
         }
     }
 }

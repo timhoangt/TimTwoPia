@@ -45,7 +45,6 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             _MemoryManager = new MemoryManager();
-            _PCB = new PCB(0);
 
             //
             // ... more?
@@ -72,6 +71,7 @@ module TSOS {
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
+            _CPU.isExecuting = false;
             //
             // Unload the Device Drivers?
             // More?
@@ -165,15 +165,17 @@ module TSOS {
         // - WriteConsole
         // - CreateProcess
         public krnCreateProcess(pBase) {
-            _PCB = new PCB(pBase);
-            var pid = _PCB.getPid();
-            _ResidentQueue.enqueue(_PCB);
+            _PID++;
+            var pid = _PID;            
+            var process = new PCB(pBase, pid);
+            _ResidentQueue.enqueue(process);
+            Control.addProcessTable(process);
             return pid;
         }
         // - ExitProcess
         public krnExitProcess(){
-            var pBase: number = _PCB.getPBase();
-            _MemoryManager.clearPartition(pBase);
+            _MemoryManager.clearPartition(0);
+            Control.removeProcessTable();
         }
         // - WaitForProcessToExit
         // - CreateFile

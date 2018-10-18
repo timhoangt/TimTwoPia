@@ -42,7 +42,6 @@ var TSOS;
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             _MemoryManager = new TSOS.MemoryManager();
-            _PCB = new TSOS.PCB(0);
             //
             // ... more?
             //
@@ -64,6 +63,7 @@ var TSOS;
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
+            _CPU.isExecuting = false;
             //
             // Unload the Device Drivers?
             // More?
@@ -149,15 +149,17 @@ var TSOS;
         // - WriteConsole
         // - CreateProcess
         Kernel.prototype.krnCreateProcess = function (pBase) {
-            _PCB = new TSOS.PCB(pBase);
-            var pid = _PCB.getPid();
-            _ResidentQueue.enqueue(_PCB);
+            _PID++;
+            var pid = _PID;
+            var process = new TSOS.PCB(pBase, pid);
+            _ResidentQueue.enqueue(process);
+            TSOS.Control.addProcessTable(process);
             return pid;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
-            var pBase = _PCB.getPBase();
-            _MemoryManager.clearPartition(pBase);
+            _MemoryManager.clearPartition(0);
+            TSOS.Control.removeProcessTable();
         };
         // - WaitForProcessToExit
         // - CreateFile

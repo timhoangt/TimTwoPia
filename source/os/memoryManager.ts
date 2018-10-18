@@ -17,30 +17,29 @@ export class MemoryManager {
         for (var i = baseReg; i <inputOpCodes.length; i++){
             _Memory.memory[i] = inputOpCodes[i]; //program is put in the memory partition
         }
-        _Memory.updateTable(baseReg); //updates table
+        Control.updateMemoryTable(baseReg); //updates table
         return baseReg;
     }
 
-    public readMemory(pBase, pLimit){
-        var opCode: string[] = [];
-        for (var i = pBase; i <= pLimit; i ++){
-            opCode.push(_Memory.memory[i]);
-        }
+    public readMemory(index){
+        var opCode: string = _Memory.memory[index];
         return opCode;
     }
 
     public updateMemory(addr, data) : void{
         var index: number = parseInt(addr, 16);                 
         _Memory.memory[index] = data.toString(16);
-        _Memory.updateTable(0);
+        Control.updateMemoryTable(0);
     }
 
-    public clearPartition(pBase) : void{
-        for (var i = pBase; i <= pBase+255; i++){
+    public clearPartition(baseReg) : void{
+        for (var i = baseReg; i <= baseReg+255; i++){
             _Memory.memory[i] = "00";
         }
-        _Memory.memoryP1 = false;
-        _Memory.updateTable(pBase);
+        if(baseReg==0){
+            _Memory.memoryP1 = false;
+        }
+        Control.updateMemoryTable(baseReg);
     }
 }
 } 

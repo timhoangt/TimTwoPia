@@ -20,27 +20,26 @@ var TSOS;
             for (var i = baseReg; i < inputOpCodes.length; i++) {
                 _Memory.memory[i] = inputOpCodes[i]; //program is put in the memory partition
             }
-            _Memory.updateTable(baseReg); //updates table
+            TSOS.Control.updateMemoryTable(baseReg); //updates table
             return baseReg;
         };
-        MemoryManager.prototype.readMemory = function (pBase, pLimit) {
-            var opCode = [];
-            for (var i = pBase; i <= pLimit; i++) {
-                opCode.push(_Memory.memory[i]);
-            }
+        MemoryManager.prototype.readMemory = function (index) {
+            var opCode = _Memory.memory[index];
             return opCode;
         };
         MemoryManager.prototype.updateMemory = function (addr, data) {
             var index = parseInt(addr, 16);
             _Memory.memory[index] = data.toString(16);
-            _Memory.updateTable(0);
+            TSOS.Control.updateMemoryTable(0);
         };
-        MemoryManager.prototype.clearPartition = function (pBase) {
-            for (var i = pBase; i <= pBase + 255; i++) {
+        MemoryManager.prototype.clearPartition = function (baseReg) {
+            for (var i = baseReg; i <= baseReg + 255; i++) {
                 _Memory.memory[i] = "00";
             }
-            _Memory.memoryP1 = false;
-            _Memory.updateTable(pBase);
+            if (baseReg == 0) {
+                _Memory.memoryP1 = false;
+            }
+            TSOS.Control.updateMemoryTable(baseReg);
         };
         return MemoryManager;
     }());

@@ -68,6 +68,120 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
+        Control.loadMemoryTable = function () {
+            var memoryContainer = document.getElementById("memoryContainer");
+            var memoryTable = document.createElement("table");
+            memoryTable.className = "taMemory";
+            memoryTable.id = "taMemory";
+            var memoryTableBody = document.createElement("tbody");
+            for (var i = 0; i < 96; i++) {
+                var row = document.createElement("tr");
+                row.id = "memoryRow-" + (8 * i);
+                var cell = document.createElement("td");
+                var val = 8 * i;
+                var hexVal = "000" + val.toString(16).toUpperCase();
+                var cellText = document.createTextNode(hexVal.slice(-4));
+                cell.id = "byte" + hexVal.slice(-4);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                for (var j = 0; j < 8; j++) {
+                    cell = document.createElement("td");
+                    var index = j + (8 * i);
+                    var id = "000" + index.toString(16).toUpperCase();
+                    var memoryValue = _Memory.memory[index];
+                    cellText = document.createTextNode(memoryValue);
+                    cell.id = id.slice(-4);
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                }
+                memoryTableBody.appendChild(row);
+            }
+            memoryTable.appendChild(memoryTableBody);
+            memoryContainer.appendChild(memoryTable);
+        };
+        Control.updateMemoryTable = function (baseReg) {
+            var memoryTable = document.getElementById("taMemory");
+            var rowId;
+            var index;
+            var cellId;
+            var limitReg = baseReg + 256;
+            for (var i = baseReg; i < limitReg / 8; i++) {
+                rowId = "memoryRow-" + (8 * i);
+                for (var j = 0; j < 8; j++) {
+                    index = j + (8 * i);
+                    var id = "000" + index.toString(16).toUpperCase();
+                    cellId = id.slice(-4);
+                    memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
+                }
+            }
+        };
+        Control.addProcessTable = function (process) {
+            var processTableBody = document.getElementById("processTbody");
+            var row = document.createElement("tr");
+            row.id = "pid" + process.pid;
+            var cell = document.createElement("td");
+            cell.id = process.id;
+            var cellText = document.createTextNode(process.pid);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pCounter);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode("0");
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pAcc);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pXreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pYreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pZflag);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pState);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pLocation);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            processTableBody.appendChild(row);
+        };
+        Control.updateProcessTable = function (pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
+            var processTableBody = document.getElementById("processTbody");
+            var row = processTableBody.rows.item(0);
+            row.cells.item(1).innerHTML = pCounter;
+            row.cells.item(2).innerHTML = pIR;
+            row.cells.item(3).innerHTML = pAcc;
+            row.cells.item(4).innerHTML = pXreg;
+            row.cells.item(5).innerHTML = pYreg;
+            row.cells.item(6).innerHTML = pZflag;
+            row.cells.item(7).innerHTML = "Running";
+        };
+        Control.removeProcessTable = function () {
+            var processTableBody = document.getElementById("processTbody");
+            processTableBody.deleteRow(0);
+        };
+        Control.updateCPU = function (cpu) {
+            var cpuTable = document.getElementById("taCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();
+        };
         Control.updateStatus = function (msg) {
             // Update status
             this.msg = msg;
@@ -125,6 +239,7 @@ var TSOS;
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnSingleStep").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -154,6 +269,11 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.hostBtnSingle_click = function (btn) {
+            document.getElementById("btnNext").disabled = false;
+        };
+        Control.hostBtnNext_click = function (btn) {
         };
         return Control;
     }());

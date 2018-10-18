@@ -307,17 +307,22 @@ var TSOS;
         };
         Shell.prototype.shellLoad = function (args) {
             var programInput = document.getElementById("taProgramInput").value;
+            programInput = programInput.replace(/(\r\n|\n|\r)/gm, "");
             var input = /^[a-f\d\s]+$/i; //hex digit filter
             if (input.test(programInput)) { //test if text matches hex digit
-                _StdOut.putText("Your program has been loaded. "); //if it does match
                 var inputOpCodes = programInput.split(" ");
-                var pBase = _MemoryManager.loadMemory(inputOpCodes);
-                if (pBase == 999) {
-                    _StdOut.putText("Memory is full. Please wait to load");
+                if (inputOpCodes.length > 256) {
+                    _StdOut.putText("Not enough memory for this program.");
                 }
                 else {
-                    var pid = _Kernel.krnCreateProcess(pBase);
-                    _StdOut.putText("Process id: " + pid + " is in resident queue");
+                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                    if (baseReg == 999) {
+                        _StdOut.putText("Memory is full.");
+                    }
+                    else {
+                        var pid = _Kernel.krnCreateProcess(baseReg);
+                        _StdOut.putText("pID " + pid + " is in resident Queue");
+                    }
                 }
             }
             else if (programInput == "") {
@@ -332,6 +337,9 @@ var TSOS;
             if (input.test(args) && args != "") {
                 if (_ResidentQueue.isEmpty()) {
                     _StdOut.putText("Nothing is loaded in memory.");
+                }
+                else if (args != _PID) {
+                    _StdOut.putText("No pID " + args + " exists.");
                 }
                 else {
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
