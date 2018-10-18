@@ -288,13 +288,13 @@ module TSOS {
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
+            // ... Create and initialize the Memory
+            _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _Memory.init();  
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
 
-            // ... Create and initialize the Memory
-            _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _Memory.init();  
         }
 
         public static hostBtnHaltOS_click(btn): void {
