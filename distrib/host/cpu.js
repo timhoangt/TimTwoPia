@@ -43,6 +43,8 @@ var TSOS;
         };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
+            // TODO: Accumulate CPU usage and profiling statistics here.
+            // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.PC == 0) {
                 var process = _ReadyQueue.dequeue();
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
@@ -143,7 +145,6 @@ var TSOS;
                                 branch = branch % 256;
                                 this.PC = branch + 2;
                             }
-                            this.PC += 2;
                         }
                         else {
                             this.PC += 2;

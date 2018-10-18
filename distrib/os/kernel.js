@@ -138,7 +138,7 @@ var TSOS;
         Kernel.prototype.programError = function (opCode) {
             // When user program entry is not a valid op ocde
             _StdOut.putText("Error. Op code " + opCode + " does not exist.");
-            _StdOut.advanceLine();
+            _StdOut.nextLine();
             _OsShell.putPrompt();
         };
         //

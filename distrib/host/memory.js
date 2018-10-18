@@ -17,8 +17,8 @@ var TSOS;
                 this.memory.push("00");
             }
             this.memoryP1 = false;
-            this.memoryP2 = false;
-            this.memoryP3 = false;
+            //this.memoryP2 = false;
+            //this.memoryP3 = false;
             TSOS.Control.loadMemoryTable();
         };
         return Memory;

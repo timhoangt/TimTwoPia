@@ -14,7 +14,6 @@
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
-
 module TSOS {
 
     export class Cpu {
@@ -31,7 +30,7 @@ module TSOS {
 
         public init(): void {
             this.PC = 0;
-            this.IR = "00";
+            this.IR = "00"; 
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -41,13 +40,16 @@ module TSOS {
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
+            // TODO: Accumulate CPU usage and profiling statistics here.
+            // Do the real work here. Be sure to set this.isExecuting appropriately.
+
             if(this.PC==0){
                 var process = _ReadyQueue.dequeue();
                 Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
-            this.decodeExecute(opCode);
+            this.decodeExecute(opCode);   
             Control.updateCPU(this);
             if(this.isExecuting){
                 Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
@@ -57,6 +59,7 @@ module TSOS {
         public fetch(PC) {
             return _MemoryManager.readMemory(PC);
         }
+
         public decodeExecute(opCode) {
             if (opCode.length > 0) {
                 var data: number;
@@ -68,100 +71,108 @@ module TSOS {
                         this.Acc = data;
                         this.PC+=2;
                         break;
+
                     case "AD":
                         addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
-                        index = parseInt(addr, 16); 
+                        index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
                         this.PC+=3;
                         break;
+
                     case "8D":
                         data = this.Acc;
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                        
                         _MemoryManager.updateMemory(addr, data);
                         this.PC+=3;
                         break;
+
                     case "6D":
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
-                        index = parseInt(addr, 16);
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
+                        index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data + this.Acc;
                         this.PC+=3;
                         break;
+
                     case "A2":
                         data = parseInt(this.fetch(this.PC+1), 16);
                         this.Xreg = data;
                         this.PC+=2;
                         break;
+
                     case "AE":
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
-                        index = parseInt(addr, 16); 
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                
+                        index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Xreg = data;
                         this.PC+=3;
                         break;
+
                     case "A0":
                         data = parseInt(this.fetch(this.PC+1), 16);
                         this.Yreg = data;
                         this.PC+=2;
                         break;
+
                     case "AC":
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Yreg = data;
                         this.PC+=3;
                         break;
+
                     case "EA":
                         this.PC++;
                         break;
-                    case "00":     
+
+                    case "00":
                         _Kernel.krnExitProcess();
                         this.init();
                         Control.updateCPU(this);
                         break;
+
                     case "EC":
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
-                        index = parseInt(addr, 16);
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
+                        index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg){
                             this.Zflag = 1;
-                        }
-                        else{
+                        } else{
                             this.Zflag = 0;
                         }
                         this.PC+=3;
                         break;
+
                     case "D0":
                         if(this.Zflag == 0){
-                        var branch = parseInt(this.fetch(this.PC+1),16) + this.PC;       
-                        if (branch < 256){
-                            this.PC = branch + 2;
-                        }
-                        else{
-                            branch = branch%256;
-                            this.PC = branch + 2;
-                        }
-                        this.PC+=2;
-                        }
-                        else{
-                            this.PC+=2; 
-                        }
+                            var branch = parseInt(this.fetch(this.PC+1),16) + this.PC;
+                            if (branch < 256){
+                                this.PC = branch + 2;
+                            } else{
+                                branch = branch%256;
+                                this.PC = branch + 2;
+                            }
+                        } else{
+                            this.PC+=2;  
+                        }                      
                         break;
+
                     case "EE":
-                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
-                        index = parseInt(addr, 16);
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
+                        index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         data++;
                         _MemoryManager.updateMemory(addr, data);
                         this.PC+=3;
                         break;
+
                     case "FF":
                         var str: string = "";
                         if (this.Xreg == 1){
-                            str = this.Yreg.toString();                          
-                        }
-                        else if (this.Xreg == 2){
+                            str = this.Yreg.toString();
+                        } else if (this.Xreg == 2){
                             addr = this.Yreg.toString(16);
                             index = parseInt(addr, 16);
                             data = parseInt(this.fetch(index), 16);
@@ -173,15 +184,16 @@ module TSOS {
                                 chr = String.fromCharCode(data);                              
                             }  
                         }
-                         _KernelInterruptQueue.enqueue(new Interrupt(PRINT_IRQ, str));
+                        _KernelInterruptQueue.enqueue(new Interrupt(PRINT_IRQ, str));                        
                         this.PC++;
                         break;
-                        default:
+
+                    default:
                         _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
                         Control.updateCPU(this);
-                        break;                    
+                        break;
                 }
             }
         }

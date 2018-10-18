@@ -1,6 +1,6 @@
 ///<reference path="../globals.ts" />
 /* ------------
-memoryAccessor.ts
+memoryManager.ts
 Requires global.ts.
 ------------ */
 var TSOS;
@@ -10,7 +10,7 @@ var TSOS;
         }
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
-            if (_Memory.memoryP1) { //assigns three partitions with a set amount of space
+            if (_Memory.memoryP1) {
                 baseReg = 999;
             }
             else {

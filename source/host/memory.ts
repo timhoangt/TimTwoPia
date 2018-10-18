@@ -18,8 +18,8 @@ module TSOS {
       }
       
       this.memoryP1 = false;
-      this.memoryP2 = false;
-      this.memoryP3 = false;
+      //this.memoryP2 = false;
+      //this.memoryP3 = false;
 
       Control.loadMemoryTable();
     }
