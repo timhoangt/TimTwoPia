@@ -43,13 +43,16 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.cycle = function () {
+            var process;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.PC == 0) {
                 //starts runnning process
-                var process = _ReadyQueue.dequeue();
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                process = _ReadyQueue.dequeue();
+                process.pState = "Running";
+                _ReadyQueue.enqueue(process);
+                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             //matches opCode with instruction
             var opCode = this.fetch(this.PC);
@@ -59,11 +62,11 @@ var TSOS;
             //calls upon an update to the CPU and process tables
             TSOS.Control.updateCPU(this);
             if (this.isExecuting) {
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
         };
         Cpu.prototype.fetch = function (PC) {
-            return _MemoryManager.readMemory(PC);
+            return _MemoryAccessor.readMemory(PC);
         };
         //Executes op codes
         Cpu.prototype.decodeExecute = function (opCode) {
@@ -90,7 +93,7 @@ var TSOS;
                     case "8D":
                         data = this.Acc;
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     //Add with carry
@@ -174,7 +177,7 @@ var TSOS;
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         data++;
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     //System Call

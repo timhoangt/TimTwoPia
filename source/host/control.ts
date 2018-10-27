@@ -126,11 +126,10 @@ module TSOS {
             var rowId: string;
             var index: number;                    
             var cellId: string;
-            var limitReg: number = baseReg + 256;
-            for (var i = baseReg; i < limitReg/8 ; i++){
-                rowId = "memoryRow-" + (8*i);
+            for (var i = 0; i < 32 ; i++){
+                rowId = "memoryRow-" + ((8*i)+baseReg);
                 for (var j = 0; j < 8; j ++){
-                    index = j + (8 * i);
+                    index = j + ((8 * i)+baseReg);
                     //writing values of each loaded bit
                     var id: string = "000" + index.toString(16).toUpperCase();                            
                     cellId = id.slice(-4);                            
@@ -196,9 +195,9 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+        public static updateProcessTable(pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
-            var row = processTableBody.rows.item(0);
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
             //updates PC, IR, ACC, X, Y, Z, State
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
@@ -209,10 +208,11 @@ module TSOS {
             row.cells.item(7).innerHTML = "Running";
         }
 
-        public static removeProcessTable(): void{
+        public static removeProcessTable(pid): void{
             //after program is complete, table is cleared
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");
-            processTableBody.deleteRow(0);
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
+            row.parentNode.removeChild(row);
         }
 
         //continuously runs when process is running
@@ -309,6 +309,7 @@ module TSOS {
             // ... Create and initialize the Memory
             _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();
+            Control.loadMemoryTable();
 
             //initialize memory accessor
             _MemoryAccessor = new MemoryAccessor();

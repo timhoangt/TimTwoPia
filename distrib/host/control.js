@@ -109,11 +109,10 @@ var TSOS;
             var rowId;
             var index;
             var cellId;
-            var limitReg = baseReg + 256;
-            for (var i = baseReg; i < limitReg / 8; i++) {
-                rowId = "memoryRow-" + (8 * i);
+            for (var i = 0; i < 32; i++) {
+                rowId = "memoryRow-" + ((8 * i) + baseReg);
                 for (var j = 0; j < 8; j++) {
-                    index = j + (8 * i);
+                    index = j + ((8 * i) + baseReg);
                     //writing values of each loaded bit
                     var id = "000" + index.toString(16).toUpperCase();
                     cellId = id.slice(-4);
@@ -167,9 +166,9 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
+        Control.updateProcessTable = function (pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
             var processTableBody = document.getElementById("processTbody");
-            var row = processTableBody.rows.item(0);
+            var row = document.getElementById("pid" + pid);
             //updates PC, IR, ACC, X, Y, Z, State
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
@@ -179,10 +178,11 @@ var TSOS;
             row.cells.item(6).innerHTML = pZflag;
             row.cells.item(7).innerHTML = "Running";
         };
-        Control.removeProcessTable = function () {
+        Control.removeProcessTable = function (pid) {
             //after program is complete, table is cleared
             var processTableBody = document.getElementById("processTbody");
-            processTableBody.deleteRow(0);
+            var row = document.getElementById("pid" + pid);
+            row.parentNode.removeChild(row);
         };
         //continuously runs when process is running
         Control.updateCPU = function (cpu) {
@@ -265,6 +265,7 @@ var TSOS;
             // ... Create and initialize the Memory
             _Memory = new TSOS.Memory(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();
+            Control.loadMemoryTable();
             //initialize memory accessor
             _MemoryAccessor = new TSOS.MemoryAccessor();
             _MemoryAccessor.init();

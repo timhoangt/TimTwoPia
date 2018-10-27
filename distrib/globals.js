@@ -26,6 +26,7 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 var _Memory;
 var _MemoryManager;
 var _MemoryAccessor;
+var _CpuScheduler; // and CPU Scheduler
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -44,6 +45,7 @@ var _ResidentQueue;
 var _ReadyQueue;
 var _PID = -1;
 var _SingleStep = false;
+var _ReadyQueue;
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;

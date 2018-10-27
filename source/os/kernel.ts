@@ -30,6 +30,7 @@ module TSOS {
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _ResidentQueue = new Queue();
             _ReadyQueue = new Queue();
+            _ReadyQueue = new Queue();
 
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
@@ -45,6 +46,7 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             _MemoryManager = new MemoryManager();
+            _CpuScheduler = new CpuScheduler();
 
             //
             // ... more?
@@ -182,15 +184,27 @@ module TSOS {
             return pid;
         }
 
-        public krnExecuteProcess(){
-            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+        public krnExecuteProcess(pid){
+            var process = _ResidentQueue.dequeue();
+            var switched:boolean = false;
+            while (process.pid != pid){
+                _ResidentQueue.enqueue(process);
+                process = _ResidentQueue.dequeue();
+                switched = !switched;
+            }
+            if (switched){
+                _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+            }
+            process.pState = "Ready";
+            _ReadyQueue.enqueue(process);
             _CPU.isExecuting = true;
         }
 
         // - ExitProcess
         public krnExitProcess(){
-            _MemoryManager.clearPartition(0);
-            Control.removeProcessTable();
+            var process = _ReadyQueue.dequeue();
+            _MemoryManager.clearPartition(process.pBase);
+            Control.removeProcessTable(process.pid);
         }
         // - WaitForProcessToExit
         // - CreateFile

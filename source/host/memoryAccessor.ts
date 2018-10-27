@@ -7,14 +7,22 @@
 module TSOS {
 
     export class MemoryAccessor {
-        public memoryP1: boolean = false;
-        public memoryP2: boolean = false;
-        public memoryP3: boolean = false;
-
-         public init(): void {
-            this.memoryP1 = false;
-            this.memoryP2 = false;
-            this.memoryP3 = false;
+        public init(): void {
         }
-     }
+
+        public writeMemory(addr, data){
+            var process = _ReadyQueue.dequeue();
+            _ReadyQueue.enqueue(process);
+            var baseReg = process.pBase;
+            var index: number = parseInt(addr, 16) + baseReg;  
+            _Memory.memory[index] = data.toString(16);
+            
+            Control.updateMemoryTable(0);
+        }
+        public readMemory(addr){
+            var baseReg = _ReadyQueue.q[0].pBase;
+            var value = _Memory.memory[baseReg+addr];
+            return value;
+        }
+}
 }

@@ -7,14 +7,21 @@ var TSOS;
 (function (TSOS) {
     var MemoryAccessor = /** @class */ (function () {
         function MemoryAccessor() {
-            this.memoryP1 = false;
-            this.memoryP2 = false;
-            this.memoryP3 = false;
         }
         MemoryAccessor.prototype.init = function () {
-            this.memoryP1 = false;
-            this.memoryP2 = false;
-            this.memoryP3 = false;
+        };
+        MemoryAccessor.prototype.writeMemory = function (addr, data) {
+            var process = _ReadyQueue.dequeue();
+            _ReadyQueue.enqueue(process);
+            var baseReg = process.pBase;
+            var index = parseInt(addr, 16) + baseReg;
+            _Memory.memory[index] = data.toString(16);
+            TSOS.Control.updateMemoryTable(0);
+        };
+        MemoryAccessor.prototype.readMemory = function (addr) {
+            var baseReg = _ReadyQueue.q[0].pBase;
+            var value = _Memory.memory[baseReg + addr];
+            return value;
         };
         return MemoryAccessor;
     }());

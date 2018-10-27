@@ -30,6 +30,7 @@ var TSOS;
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _ResidentQueue = new TSOS.Queue();
             _ReadyQueue = new TSOS.Queue();
+            _ReadyQueue = new TSOS.Queue();
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -42,6 +43,7 @@ var TSOS;
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
             _MemoryManager = new TSOS.MemoryManager();
+            _CpuScheduler = new TSOS.CpuScheduler();
             //
             // ... more?
             //
@@ -163,14 +165,26 @@ var TSOS;
             TSOS.Control.addProcessTable(process);
             return pid;
         };
-        Kernel.prototype.krnExecuteProcess = function () {
-            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+        Kernel.prototype.krnExecuteProcess = function (pid) {
+            var process = _ResidentQueue.dequeue();
+            var switched = false;
+            while (process.pid != pid) {
+                _ResidentQueue.enqueue(process);
+                process = _ResidentQueue.dequeue();
+                switched = !switched;
+            }
+            if (switched) {
+                _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+            }
+            process.pState = "Ready";
+            _ReadyQueue.enqueue(process);
             _CPU.isExecuting = true;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
-            _MemoryManager.clearPartition(0);
-            TSOS.Control.removeProcessTable();
+            var process = _ReadyQueue.dequeue();
+            _MemoryManager.clearPartition(process.pBase);
+            TSOS.Control.removeProcessTable(process.pid);
         };
         // - WaitForProcessToExit
         // - CreateFile

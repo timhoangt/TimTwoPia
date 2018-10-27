@@ -71,6 +71,9 @@ var TSOS;
             // run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process according to their pID.");
             this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Wipes the memory clean.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -231,6 +234,9 @@ var TSOS;
                     case "run":
                         _StdOut.putText("Runs the process with pID <pID>.");
                         break;
+                    case "clearmem":
+                        _StdOut.putText("Wipes memory clean.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -339,16 +345,16 @@ var TSOS;
                     _StdOut.putText("Nothing is loaded in memory.");
                 }
                 //matches value to potential pID
-                else if (args != _PID) {
-                    _StdOut.putText("No pID " + args + " exists.");
-                }
                 else {
-                    _Kernel.krnExecuteProcess();
+                    _Kernel.krnExecuteProcess(args);
                 }
             }
             else {
                 _StdOut.putText("Please enter a valid pID.");
             }
+        };
+        Shell.prototype.shellClearmem = function (args) {
+            _MemoryManager.clearMemory();
         };
         return Shell;
     }());
