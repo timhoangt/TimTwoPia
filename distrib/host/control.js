@@ -127,7 +127,6 @@ var TSOS;
             var row = document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell = document.createElement("td");
-            cell.id = process.id;
             //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
@@ -166,17 +165,17 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
+        Control.updateProcessTable = function (pid, pState) {
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
             //updates PC, IR, ACC, X, Y, Z, State
-            row.cells.item(1).innerHTML = pCounter;
-            row.cells.item(2).innerHTML = pIR;
-            row.cells.item(3).innerHTML = pAcc;
-            row.cells.item(4).innerHTML = pXreg;
-            row.cells.item(5).innerHTML = pYreg;
-            row.cells.item(6).innerHTML = pZflag;
-            row.cells.item(7).innerHTML = "Running";
+            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            row.cells.item(2).innerHTML = _CPU.IR.toString();
+            row.cells.item(3).innerHTML = _CPU.Acc.toString();
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString();
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString();
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString();
+            row.cells.item(7).innerHTML = pState;
         };
         Control.removeProcessTable = function (pid) {
             //after program is complete, table is cleared
@@ -185,15 +184,15 @@ var TSOS;
             row.parentNode.removeChild(row);
         };
         //continuously runs when process is running
-        Control.updateCPU = function (cpu) {
+        Control.updateCPU = function () {
             var cpuTable = document.getElementById("taCPU");
             //updates values in CPU table
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString();
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString();
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString();
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString();
         };
         Control.updateStatus = function (msg) {
             // Update status
@@ -305,6 +304,8 @@ var TSOS;
         Control.hostBtnNextStep_click = function (btn) {
             if (_CPU.isExecuting) {
                 _CPU.cycle();
+                Control.updateCPU();
+                Control.updateProcessTable(_RunningPID, "Running");
             }
         };
         Control.hostBtnNextStep_onOff = function () {

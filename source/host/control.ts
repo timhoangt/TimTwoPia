@@ -145,7 +145,6 @@ module TSOS {
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
-            cell.id = process.id;
 
             //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
             var cellText = document.createTextNode(process.pid);
@@ -195,17 +194,17 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+        public static updateProcessTable(pid, pState): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
             //updates PC, IR, ACC, X, Y, Z, State
-            row.cells.item(1).innerHTML = pCounter;
-            row.cells.item(2).innerHTML = pIR;
-            row.cells.item(3).innerHTML = pAcc;
-            row.cells.item(4).innerHTML = pXreg;
-            row.cells.item(5).innerHTML = pYreg;
-            row.cells.item(6).innerHTML = pZflag;
-            row.cells.item(7).innerHTML = "Running";
+            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            row.cells.item(2).innerHTML = _CPU.IR.toString();
+            row.cells.item(3).innerHTML = _CPU.Acc.toString();
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString();
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString();
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString();
+            row.cells.item(7).innerHTML = pState;
         }
 
         public static removeProcessTable(pid): void{
@@ -216,15 +215,15 @@ module TSOS {
         }
 
         //continuously runs when process is running
-        public static updateCPU(cpu): void {
+        public static updateCPU(): void {
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
             //updates values in CPU table
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();                        
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString();                      
         } 
 
         public static msg : string;
@@ -356,6 +355,8 @@ module TSOS {
         public static hostBtnNextStep_click(btn): void {
             if(_CPU.isExecuting){
                 _CPU.cycle();
+                Control.updateCPU();
+                Control.updateProcessTable(_RunningPID, "Running");
             }
         }
 

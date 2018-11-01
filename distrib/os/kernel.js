@@ -30,7 +30,6 @@ var TSOS;
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _ResidentQueue = new TSOS.Queue();
             _ReadyQueue = new TSOS.Queue();
-            _ReadyQueue = new TSOS.Queue();
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -86,7 +85,11 @@ var TSOS;
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if (!_SingleStep) {
+                    _CpuScheduler.checkSchedule();
                     _CPU.cycle();
+                    TSOS.Control.updateCPU();
+                    if (_CPU.IR !== "00")
+                        TSOS.Control.updateProcessTable(_RunningPID, "Running");
                 }
                 else {
                     TSOS.Control.hostBtnNextStep_onOff();
@@ -131,6 +134,9 @@ var TSOS;
                 case PRINT_IRQ:
                     this.print(params);
                     break;
+                case CONTEXT_SWITCH_IRQ:
+                    this.contextSwitch();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -166,25 +172,45 @@ var TSOS;
             return pid;
         };
         Kernel.prototype.krnExecuteProcess = function (pid) {
-            var process = _ResidentQueue.dequeue();
+            var process;
             var switched = false;
-            while (process.pid != pid) {
-                _ResidentQueue.enqueue(process);
+            var pidExists = false;
+            for (var i = 0; i < _ResidentQueue.getSize(); i++) {
                 process = _ResidentQueue.dequeue();
+                if (process.pid == pid) {
+                    pidExists = true;
+                    break;
+                }
+                _ResidentQueue.enqueue(process);
                 switched = !switched;
             }
-            if (switched) {
-                _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+            if (pidExists) {
+                if (switched) {
+                    _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+                }
+                process.pState = "Ready";
+                _ReadyQueue.enqueue(process);
+                _CpuScheduler.start();
+                _CPU.isExecuting = true;
             }
-            process.pState = "Ready";
-            _ReadyQueue.enqueue(process);
+            else {
+                _StdOut.putText("No process with id: " + pid);
+                _StdOut.advanceLine();
+            }
+        };
+        Kernel.prototype.krnExecuteAllProcess = function () {
+            while (_ResidentQueue.getSize() > 0) {
+                _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            }
+            _CpuScheduler.start();
             _CPU.isExecuting = true;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
-            var process = _ReadyQueue.dequeue();
-            _MemoryManager.clearPartition(process.pBase);
-            TSOS.Control.removeProcessTable(process.pid);
+            _MemoryManager.clearPartition(_RunningpBase);
+            TSOS.Control.removeProcessTable(_RunningPID);
+            _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            _CpuScheduler.checkSchedule();
         };
         // - WaitForProcessToExit
         // - CreateFile
@@ -220,6 +246,29 @@ var TSOS;
             // Start BSOD function.
             _Console.BSOD(msg);
             this.krnShutdown();
+        };
+        Kernel.prototype.contextSwitch = function () {
+            if (_CPU.IR != "00") {
+                var currProcess = new TSOS.PCB(_RunningpBase, _RunningPID);
+                currProcess.pCounter = _CPU.PC;
+                currProcess.pAcc = _CPU.Acc;
+                currProcess.pXreg = _CPU.Xreg;
+                currProcess.pYreg = _CPU.Yreg;
+                currProcess.pZflag = _CPU.Zflag;
+                currProcess.pState = "Resident";
+                _ReadyQueue.enqueue(currProcess);
+                TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
+            }
+            var nextProcess = _ReadyQueue.dequeue();
+            _CPU.PC = nextProcess.pCounter;
+            _CPU.Acc = nextProcess.pAcc;
+            _CPU.Xreg = nextProcess.pXreg;
+            _CPU.Yreg = nextProcess.pYreg;
+            _CPU.Zflag = nextProcess.pZflag;
+            nextProcess.pState = "Running";
+            _RunningPID = nextProcess.pid;
+            _RunningpBase = nextProcess.pBase;
+            TSOS.Control.updateProcessTable(_RunningPID, nextProcess.pState);
         };
         return Kernel;
     }());

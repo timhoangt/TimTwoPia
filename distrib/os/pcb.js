@@ -14,7 +14,7 @@ var TSOS;
             this.pBase = pBase;
             this.pid = pid;
             this.pState = "Resident";
-            this.pLimit = pBase + 255;
+            this.pLimit = 255;
         }
         return PCB;
     }());

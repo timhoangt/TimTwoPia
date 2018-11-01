@@ -72,7 +72,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process according to their pID.");
             this.commandList[this.commandList.length] = sc;
             // clearmem
-            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Wipes the memory clean.");
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "- Wipes the memory clean.");
+            this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all of the loaded processes.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -237,6 +240,9 @@ var TSOS;
                     case "clearmem":
                         _StdOut.putText("Wipes memory clean.");
                         break;
+                    case "runall":
+                        _StdOut.putText("Runs all of the loaded processes.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -355,6 +361,14 @@ var TSOS;
         };
         Shell.prototype.shellClearmem = function (args) {
             _MemoryManager.clearMemory();
+        };
+        Shell.prototype.shellRunall = function (args) {
+            if (_ResidentQueue.isEmpty()) {
+                _StdOut.putText("Nothing is loaded in memory.");
+            }
+            else {
+                _Kernel.krnExecuteAllProcess();
+            }
         };
         return Shell;
     }());

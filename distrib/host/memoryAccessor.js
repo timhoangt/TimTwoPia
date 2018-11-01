@@ -11,15 +11,13 @@ var TSOS;
         MemoryAccessor.prototype.init = function () {
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
-            var process = _ReadyQueue.dequeue();
-            _ReadyQueue.enqueue(process);
-            var baseReg = process.pBase;
+            var baseReg = _RunningpBase;
             var index = parseInt(addr, 16) + baseReg;
             _Memory.memory[index] = data.toString(16);
             TSOS.Control.updateMemoryTable(0);
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
-            var baseReg = _ReadyQueue.q[0].pBase;
+            var baseReg = _RunningpBase;
             var value = _Memory.memory[baseReg + addr];
             return value;
         };

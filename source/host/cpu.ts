@@ -40,28 +40,12 @@ module TSOS {
         }
 
         public cycle(): void {
-            var process;
-            _Kernel.krnTrace('CPU cycle');
-            // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
-
-            if(this.PC==0){
-                //starts runnning process
-                process = _ReadyQueue.dequeue();
-                process.pState = "Running";
-                _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
             //matches opCode with instruction
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
             //calls upon execution function
             this.decodeExecute(this.IR);
             //calls upon an update to the CPU and process tables
-            Control.updateCPU(this);
-            if(this.isExecuting){
-                Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
         }
 
         public fetch(PC) {
@@ -139,8 +123,7 @@ module TSOS {
                     //Break (which is really a system call) 
                     case "00":
                         _Kernel.krnExitProcess();
-                        this.init();
-                        Control.updateCPU(this);
+                        if(_SingleStep) Control.hostBtnNextStep_onOff();
                         break;
                     //Compare a byte in memory to the X reg 
                     case "EC":
@@ -203,8 +186,6 @@ module TSOS {
                         _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
-                        //updates CPU table
-                        Control.updateCPU(this);
                         break;
                 }
             }

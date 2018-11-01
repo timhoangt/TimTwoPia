@@ -43,27 +43,12 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.cycle = function () {
-            var process;
-            _Kernel.krnTrace('CPU cycle');
-            // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
-            if (this.PC == 0) {
-                //starts runnning process
-                process = _ReadyQueue.dequeue();
-                process.pState = "Running";
-                _ReadyQueue.enqueue(process);
-                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
             //matches opCode with instruction
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
             //calls upon execution function
             this.decodeExecute(this.IR);
             //calls upon an update to the CPU and process tables
-            TSOS.Control.updateCPU(this);
-            if (this.isExecuting) {
-                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
         };
         Cpu.prototype.fetch = function (PC) {
             return _MemoryAccessor.readMemory(PC);
@@ -139,8 +124,8 @@ var TSOS;
                     //Break (which is really a system call) 
                     case "00":
                         _Kernel.krnExitProcess();
-                        this.init();
-                        TSOS.Control.updateCPU(this);
+                        if (_SingleStep)
+                            TSOS.Control.hostBtnNextStep_onOff();
                         break;
                     //Compare a byte in memory to the X reg 
                     case "EC":
@@ -206,8 +191,6 @@ var TSOS;
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
-                        //updates CPU table
-                        TSOS.Control.updateCPU(this);
                         break;
                 }
             }

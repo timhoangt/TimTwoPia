@@ -126,7 +126,13 @@ module TSOS {
             // clearmem
             sc = new ShellCommand(this.shellClearmem,
                 "clearmem",
-                "Wipes the memory clean.");
+                "- Wipes the memory clean.");
+            this.commandList[this.commandList.length] = sc;
+
+            // runall
+            sc = new ShellCommand(this.shellRunall,
+                "runall",
+                "- Runs all of the loaded processes.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -304,6 +310,9 @@ module TSOS {
                     case "clearmem":
                         _StdOut.putText("Wipes memory clean.");
                         break;
+                    case "runall":
+                        _StdOut.putText("Runs all of the loaded processes.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -429,6 +438,14 @@ module TSOS {
 
         public shellClearmem(args){
             _MemoryManager.clearMemory();
+        }
+
+        public shellRunall(args) {
+            if (_ResidentQueue.isEmpty()){
+                _StdOut.putText("Nothing is loaded in memory.");
+            } else {
+                _Kernel.krnExecuteAllProcess();
+            } 
         }
 
 
