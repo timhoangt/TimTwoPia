@@ -99,7 +99,9 @@ module TSOS {
                     _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     Control.updateCPU();
-                    if (_CPU.IR!=="00") Control.updateProcessTable(_RunningPID, "Running");
+                    if (_CPU.IR!=="00"){
+                        Control.updateProcessTable(_RunningPID, "Running");
+                    }
                 }
                 else {
                     Control.hostBtnNextStep_onOff();

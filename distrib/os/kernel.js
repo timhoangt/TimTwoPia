@@ -88,8 +88,9 @@ var TSOS;
                     _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     TSOS.Control.updateCPU();
-                    if (_CPU.IR !== "00")
+                    if (_CPU.IR !== "00") {
                         TSOS.Control.updateProcessTable(_RunningPID, "Running");
+                    }
                 }
                 else {
                     TSOS.Control.hostBtnNextStep_onOff();

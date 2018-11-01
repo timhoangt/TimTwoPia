@@ -77,6 +77,8 @@ var TSOS;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all of the loaded processes.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Changes the Round Robin quantum.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -243,6 +245,9 @@ var TSOS;
                     case "runall":
                         _StdOut.putText("Runs all of the loaded processes.");
                         break;
+                    case "quantum":
+                        _StdOut.putText("Changes the Round Robin quantum to <int>.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -368,6 +373,15 @@ var TSOS;
             }
             else {
                 _Kernel.krnExecuteAllProcess();
+            }
+        };
+        Shell.prototype.shellQuantum = function (args) {
+            var valText = /^\d*$/;
+            if (valText.test(args) && args != "") {
+                _CpuScheduler.quantum = args;
+            }
+            else {
+                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
             }
         };
         return Shell;

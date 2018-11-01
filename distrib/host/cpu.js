@@ -124,8 +124,9 @@ var TSOS;
                     //Break (which is really a system call) 
                     case "00":
                         _Kernel.krnExitProcess();
-                        if (_SingleStep)
+                        if (_SingleStep) {
                             TSOS.Control.hostBtnNextStep_onOff();
+                        }
                         break;
                     //Compare a byte in memory to the X reg 
                     case "EC":
