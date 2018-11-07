@@ -25,6 +25,8 @@ const PROGRAMERROR_IRQ: number = 2;
 const PRINT_IRQ: number = 3;
 
 const CONTEXT_SWITCH_IRQ: number = 4;
+
+const KILL_IRQ: number = 5;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -57,7 +59,7 @@ var _ReadyQueue;
 var _PID: number = -1;
 var _SingleStep = false;
 var _ReadyQueue;
-var _RunningPID: number = 0; // current running pid
+var _RunningPID: number; // current running pid
 var _RunningpBase: number = 0; // base reg of running process
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.

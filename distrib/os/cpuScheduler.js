@@ -10,6 +10,7 @@ var TSOS;
             this.algorithm = "Round Robin";
             this.quantum = 6;
             this.currCycle = 0;
+            this.activePIDList = new Array();
         }
         CpuScheduler.prototype.start = function () {
             this.currCycle = 0;

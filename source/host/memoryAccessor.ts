@@ -12,10 +12,15 @@ module TSOS {
 
         public writeMemory(addr, data){
             var baseReg = _RunningpBase;
-            var index: number = parseInt(addr, 16) + baseReg;  
-            _Memory.memory[index] = data.toString(16);
-            
-            Control.updateMemoryTable(0);
+            var limitReg = baseReg + 255;
+            var index: number = parseInt(addr, 16) + baseReg;
+            if(index > limitReg){
+            } 
+            else {
+                _Memory.memory[index] = data.toString(16);
+                // 0 for now bc only one parition
+                Control.updateMemoryTable(0);
+            }
         }
         public readMemory(addr){
             var baseReg = _RunningpBase;

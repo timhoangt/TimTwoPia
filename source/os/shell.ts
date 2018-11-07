@@ -141,7 +141,16 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
+            sc = new ShellCommand(this.shellPs,
+                "ps",
+                "Lists the running processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<pid> - Kills the specified process id.");
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -321,6 +330,12 @@ module TSOS {
                     case "quantum":
                         _StdOut.putText("Changes the Round Robin quantum to <int>.");
                         break;
+                    case "ps":
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -451,19 +466,40 @@ module TSOS {
         public shellRunall(args) {
             if (_ResidentQueue.isEmpty()){
                 _StdOut.putText("Nothing is loaded in memory.");
-            } else {
+            }
+            else {
                 _Kernel.krnExecuteAllProcess();
             } 
         }
 
         public shellQuantum(args) {
+            if (_CpuScheduler.activePIDList.length == 0){
+                _StdOut.putText("No process is active");
+            }
+            else {
+                _StdOut.putText("Active processes [" + _CpuScheduler.activePIDList.toString() + "]");
+            }
+        }
+
+        public shellPs(args) {
+            if (_CpuScheduler.activePIDList.length == 0){
+                _StdOut.putText("No processes are active");
+            }
+            else {
+                _StdOut.putText("Active processes: " + _CpuScheduler.activePIDList.toString());
+            }
+        }
+
+        public shellKill(args) {
             var valText = /^\d*$/;
             if (valText.test(args) && args != ""){
-                _CpuScheduler.quantum = args;
-            } else {
-                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+                _KernelInterruptQueue.enqueue(new Interrupt(KILL_IRQ, args));
+            }
+            else {
+                _StdOut.putText("Please enter a valid pID after kill command.");
             }  
         }
+
 
 
     }

@@ -12,9 +12,15 @@ var TSOS;
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
             var baseReg = _RunningpBase;
+            var limitReg = baseReg + 255;
             var index = parseInt(addr, 16) + baseReg;
-            _Memory.memory[index] = data.toString(16);
-            TSOS.Control.updateMemoryTable(0);
+            if (index > limitReg) {
+            }
+            else {
+                _Memory.memory[index] = data.toString(16);
+                // 0 for now bc only one parition
+                TSOS.Control.updateMemoryTable(0);
+            }
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
             var baseReg = _RunningpBase;

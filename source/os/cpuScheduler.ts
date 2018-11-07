@@ -8,6 +8,7 @@ module TSOS {
 		public algorithm = "Round Robin";
         public quantum = 6;
         public currCycle = 0;
+        public activePIDList = new Array<number>();
 
         public start(): void {
             this.currCycle = 0;

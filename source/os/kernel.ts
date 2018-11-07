@@ -154,6 +154,9 @@ module TSOS {
                 case CONTEXT_SWITCH_IRQ:
                     this.contextSwitch();
                     break;
+                case KILL_IRQ:
+                    this.killProcess(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -209,6 +212,7 @@ module TSOS {
                     _ResidentQueue.enqueue(_ResidentQueue.dequeue());
                 }
                 process.pState = "Ready";
+                _CpuScheduler.activePIDList.push(process.pid);  
                 _ReadyQueue.enqueue(process);
                 _CpuScheduler.start();
                 _CPU.isExecuting = true;
@@ -218,9 +222,13 @@ module TSOS {
                 _StdOut.advanceLine();
             }
         }
+
         public krnExecuteAllProcess(){
-            while (_ResidentQueue.getSize() > 0){
-                _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            var process;
+            while (!_ResidentQueue.isEmpty()){
+                process = _ResidentQueue.dequeue();
+                _CpuScheduler.activePIDList.push(process.pid);
+                _ReadyQueue.enqueue(process);
             }
             _CpuScheduler.start();
             _CPU.isExecuting = true;
@@ -230,6 +238,8 @@ module TSOS {
         public krnExitProcess(){
             _MemoryManager.clearPartition(_RunningpBase);
             Control.removeProcessTable(_RunningPID);
+            var index = _CpuScheduler.activePIDList.indexOf(_RunningPID);
+            _CpuScheduler.activePIDList.splice(index, 1);
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
             _CpuScheduler.checkSchedule();
         }
@@ -295,5 +305,37 @@ module TSOS {
             _RunningpBase = nextProcess.pBase;        
             Control.updateProcessTable(_RunningPID, nextProcess.pState);            
         }
+
+        public killProcess(pid){
+            var process;
+            var index = _CpuScheduler.activePIDList.indexOf(parseInt(pid));
+             if (index == -1){
+                _StdOut.putText("No process " + pid + " is active"); 
+                _OsShell.putPrompt();
+            } else {
+                if (pid == _RunningPID){
+                    this.krnExitProcess();
+                    _CPU.IR = "00";
+                } else {
+                    for (var i=0; i<_ReadyQueue.getSize(); i++){
+                        process = _ReadyQueue.dequeue();
+                        if (process.pid == pid){
+                            var pBase = process.pBase;
+                            break;
+                        } else {
+                            _ReadyQueue.enqueue(process);
+                        }
+                    }
+                }
+                Control.removeProcessTable(pid);
+                _MemoryManager.clearPartition(pBase);
+                _CpuScheduler.activePIDList.splice(index, 1);
+                _StdOut.putText("Process " + pid + " has been killed");
+                _StdOut.advanceLine();
+                _CpuScheduler.currCycle = _CpuScheduler.quantum;
+                _CpuScheduler.checkSchedule(); 
+            }
+        }
+
     }
 }

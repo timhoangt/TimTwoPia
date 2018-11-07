@@ -80,7 +80,11 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Changes the Round Robin quantum.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
+            sc = new TSOS.ShellCommand(this.shellPs, "ps", "Lists the running processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
             // kill <id> - kills the specified process id.
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<pid> - Kills the specified process id.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -248,6 +252,12 @@ var TSOS;
                     case "quantum":
                         _StdOut.putText("Changes the Round Robin quantum to <int>.");
                         break;
+                    case "ps":
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -376,12 +386,28 @@ var TSOS;
             }
         };
         Shell.prototype.shellQuantum = function (args) {
-            var valText = /^\d*$/;
-            if (valText.test(args) && args != "") {
-                _CpuScheduler.quantum = args;
+            if (_CpuScheduler.activePIDList.length == 0) {
+                _StdOut.putText("No process is active");
             }
             else {
-                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+                _StdOut.putText("Active processes [" + _CpuScheduler.activePIDList.toString() + "]");
+            }
+        };
+        Shell.prototype.shellPs = function (args) {
+            if (_CpuScheduler.activePIDList.length == 0) {
+                _StdOut.putText("No processes are active");
+            }
+            else {
+                _StdOut.putText("Active processes: " + _CpuScheduler.activePIDList.toString());
+            }
+        };
+        Shell.prototype.shellKill = function (args) {
+            var valText = /^\d*$/;
+            if (valText.test(args) && args != "") {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_IRQ, args));
+            }
+            else {
+                _StdOut.putText("Please enter a valid pID after kill command.");
             }
         };
         return Shell;

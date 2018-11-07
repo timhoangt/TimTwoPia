@@ -199,11 +199,11 @@ module TSOS {
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
             //updates PC, IR, ACC, X, Y, Z, State
             row.cells.item(1).innerHTML = _CPU.PC.toString();
-            row.cells.item(2).innerHTML = _CPU.IR.toString();
-            row.cells.item(3).innerHTML = _CPU.Acc.toString();
-            row.cells.item(4).innerHTML = _CPU.Xreg.toString();
-            row.cells.item(5).innerHTML = _CPU.Yreg.toString();
-            row.cells.item(6).innerHTML = _CPU.Zflag.toString();
+            row.cells.item(2).innerHTML = _CPU.IR;
+            row.cells.item(3).innerHTML = _CPU.Acc.toString(16);
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString(16);
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString(16);
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString(16);
             row.cells.item(7).innerHTML = pState;
         }
 
@@ -220,10 +220,10 @@ module TSOS {
             //updates values in CPU table
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();            
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString();            
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString();                      
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16);            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16);            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16);            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16);                      
         } 
 
         public static msg : string;
