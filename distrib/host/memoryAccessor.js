@@ -12,26 +12,27 @@ var TSOS;
             TSOS.Control.loadMemoryTable();
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
+            //checks the register for the current program for the first address
             var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = parseInt(addr, 16) + baseReg;
-            if (index > limitReg) {
+            if (index > limitReg) { //if there is not enough space get access error
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(ACCESS_IRQ, _CpuScheduler.runningProcess.pid));
             }
-            else {
+            else { //update memory table
                 _Memory.memory[index] = data.toString(16);
-                // 0 for now bc only one parition
                 TSOS.Control.updateMemoryTable(baseReg);
             }
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
+            //checks the register for the current program for the first address
             var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = baseReg + addr;
-            if (index > limitReg) {
+            if (index > limitReg) { //if there is not enough space get access error
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(ACCESS_IRQ, _CpuScheduler.runningProcess.pid));
             }
-            else {
+            else { //pulls the data in the memory
                 var value = _Memory.memory[index];
                 return value;
             }

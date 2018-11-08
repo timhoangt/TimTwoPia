@@ -182,6 +182,7 @@ var TSOS;
             var process;
             var switched = false;
             var pidExists = false;
+            //all the pids in the resident queue exist
             for (var i = 0; i < _ResidentQueue.getSize(); i++) {
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid) {
@@ -191,17 +192,17 @@ var TSOS;
                 _ResidentQueue.enqueue(process);
                 switched = !switched;
             }
-            if (pidExists) {
+            if (pidExists) { //run the process if it exists
                 if (switched) {
                     _ResidentQueue.enqueue(_ResidentQueue.dequeue());
                 }
-                process.pState = "Ready";
+                process.pState = "Ready"; //the program is now ready and active
                 _CpuScheduler.activePIDList.push(process.pid);
                 _ReadyQueue.enqueue(process);
                 TSOS.Control.updateProcessTable(process.pid, process.pState);
                 _CpuScheduler.start();
             }
-            else {
+            else { //if the process doesnt exist
                 _StdOut.putText("No process with id: " + pid);
                 _StdOut.nextLine();
             }
@@ -229,9 +230,9 @@ var TSOS;
             _StdOut.putText("The wait time was " + process.waitTime + " ticks.");
             _StdOut.nextLine();
             _OsShell.putPrompt();
-            _MemoryManager.clearPartition(process.pBase);
-            TSOS.Control.removeProcessTable(process.pid);
-            var index = _CpuScheduler.activePIDList.indexOf(process.pid);
+            _MemoryManager.clearPartition(process.pBase); //clears program from memory
+            TSOS.Control.removeProcessTable(process.pid); //removes program from processs table
+            var index = _CpuScheduler.activePIDList.indexOf(process.pid); //removes from active list
             _CpuScheduler.activePIDList.splice(index, 1);
             if (_CpuScheduler.activePIDList.length == 0) {
                 _CpuScheduler.checkSchedule();
@@ -276,7 +277,7 @@ var TSOS;
             this.krnShutdown();
         };
         Kernel.prototype.contextSwitch = function (runningProcess) {
-            if (_CPU.IR != "00") {
+            if (_CPU.IR != "00") { //puts process in process control block
                 var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready");
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
@@ -287,7 +288,7 @@ var TSOS;
                 _ReadyQueue.enqueue(currProcess);
                 TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
-            var nextProcess = _ReadyQueue.dequeue();
+            var nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -298,19 +299,20 @@ var TSOS;
             this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
         };
+        //kills process
         Kernel.prototype.killProcess = function (pid) {
             var process;
             var index = _CpuScheduler.activePIDList.indexOf(parseInt(pid));
-            if (index == -1) {
+            if (index == -1) { //if it doesnt exist
                 _StdOut.putText("No process " + pid + " is active");
                 _StdOut.nextLine();
                 _OsShell.putPrompt();
             }
             else {
-                if (pid == _CpuScheduler.runningProcess.pid) {
-                    this.krnExitProcess(_CpuScheduler.runningProcess);
+                if (pid == _CpuScheduler.runningProcess.pid) { //if its running
+                    this.krnExitProcess(_CpuScheduler.runningProcess); //end the program
                 }
-                else {
+                else { //if it exists but isnt running
                     for (var i = 0; i < _ReadyQueue.getSize(); i++) {
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid) {

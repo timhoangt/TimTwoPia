@@ -303,18 +303,19 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
         Control.hostBtnSingle_click = function (btn) {
-            _SingleStep = !(_SingleStep);
-            if (_SingleStep) {
+            _SingleStep = !(_SingleStep); //if single step mode button is clicked
+            if (_SingleStep) { //if its avtivated
                 btn.style.backgroundColor = "lime";
                 btn.style.color = "black";
-                this.hostBtnNextStep_onOff();
+                this.hostBtnNextStep_onOff(); //allow for one step to be done at a time
             }
-            else {
+            else { //disable next step button
                 document.getElementById("btnNextStep").disabled = true;
                 btn.style.backgroundColor = "black";
                 btn.style.color = "lime";
             }
         };
+        //does the next step in the program
         Control.hostBtnNextStep_click = function (btn) {
             if (_CPU.isExecuting) {
                 _CPU.cycle();
@@ -325,13 +326,14 @@ var TSOS;
                 _CpuScheduler.checkSchedule();
             }
         };
+        //turns single step mode on and off
         Control.hostBtnNextStep_onOff = function () {
-            if (_CPU.isExecuting) {
+            if (_CPU.isExecuting) { //if there is a running program allow for next step button to work
                 document.getElementById("btnNextStep").disabled = false;
                 document.getElementById("btnNextStep").style.backgroundColor = "lime";
                 document.getElementById("btnNextStep").style.color = "black";
             }
-            else {
+            else { //else disable the next step button
                 document.getElementById("btnNextStep").disabled = true;
                 document.getElementById("btnNextStep").style.backgroundColor = "black";
                 document.getElementById("btnNextStep").style.color = "lime";
