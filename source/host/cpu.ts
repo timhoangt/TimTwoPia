@@ -122,7 +122,7 @@ module TSOS {
                         break;
                     //Break (which is really a system call) 
                     case "00":
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         if(_SingleStep){
                             Control.hostBtnNextStep_onOff();
                         }
@@ -186,7 +186,7 @@ module TSOS {
 
                     default:
                         _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, opCode));
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         this.init();
                         break;
                 }

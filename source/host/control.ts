@@ -197,8 +197,12 @@ module TSOS {
         public static updateProcessTable(pid, pState): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }
             //updates PC, IR, ACC, X, Y, Z, State
-            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            row.cells.item(1).innerHTML = pc;
             row.cells.item(2).innerHTML = _CPU.IR;
             row.cells.item(3).innerHTML = _CPU.Acc.toString(16);
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16);
@@ -209,16 +213,28 @@ module TSOS {
 
         public static removeProcessTable(pid): void{
             //after program is complete, table is cleared
-            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");
-            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
-            row.parentNode.removeChild(row);
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
+            
+            if (pid == -1 ){
+                while(processTableBody.hasChildNodes()){
+                    processTableBody.removeChild(processTableBody.firstChild);
+                }
+            }
+            else {
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
+                row.parentNode.removeChild(row);  
+            } 
         }
 
         //continuously runs when process is running
         public static updateCPU(): void {
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }
             //updates values in CPU table
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = pc;
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();            
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16);            
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16);            
@@ -308,7 +324,6 @@ module TSOS {
             // ... Create and initialize the Memory
             _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();
-            Control.loadMemoryTable();
 
             //initialize memory accessor
             _MemoryAccessor = new MemoryAccessor();
@@ -356,7 +371,10 @@ module TSOS {
             if(_CPU.isExecuting){
                 _CPU.cycle();
                 Control.updateCPU();
-                Control.updateProcessTable(_RunningPID, "Running");
+                if (_CPU.IR!=="00"){
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                }
+                _CpuScheduler.checkSchedule(); 
             }
         }
 

@@ -27,6 +27,8 @@ const PRINT_IRQ: number = 3;
 const CONTEXT_SWITCH_IRQ: number = 4;
 
 const KILL_IRQ: number = 5;
+
+const ACCESS_IRQ: number = 6;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.

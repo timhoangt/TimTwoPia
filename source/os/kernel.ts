@@ -96,12 +96,12 @@ module TSOS {
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_SingleStep){
-                    _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     Control.updateCPU();
                     if (_CPU.IR!=="00"){
-                        Control.updateProcessTable(_RunningPID, "Running");
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
                     }
+                    _CpuScheduler.checkSchedule();    
                 }
                 else {
                     Control.hostBtnNextStep_onOff();
@@ -152,10 +152,13 @@ module TSOS {
                     this.print(params);
                     break;
                 case CONTEXT_SWITCH_IRQ:
-                    this.contextSwitch();
+                    this.contextSwitch(params);
                     break;
                 case KILL_IRQ:
                     this.killProcess(params);
+                    break;
+                case ACCESS_IRQ:
+                    this.memoryAccessError(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -186,7 +189,7 @@ module TSOS {
         public krnCreateProcess(pBase) {
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid);
+            var process = new PCB(pBase, pid, "Resident");
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -214,12 +217,12 @@ module TSOS {
                 process.pState = "Ready";
                 _CpuScheduler.activePIDList.push(process.pid);  
                 _ReadyQueue.enqueue(process);
+                Control.updateProcessTable(process.pid, process.pState);
                 _CpuScheduler.start();
-                _CPU.isExecuting = true;
             }
             else {
                 _StdOut.putText("No process with id: " + pid); 
-                _StdOut.advanceLine();
+                _StdOut.nextLine();
             }
         }
 
@@ -228,20 +231,35 @@ module TSOS {
             while (!_ResidentQueue.isEmpty()){
                 process = _ResidentQueue.dequeue();
                 _CpuScheduler.activePIDList.push(process.pid);
+                process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
+                Control.updateProcessTable(process.pid, process.pState);
             }
             _CpuScheduler.start();
-            _CPU.isExecuting = true;
         }
 
         // - ExitProcess
-        public krnExitProcess(){
-            _MemoryManager.clearPartition(_RunningpBase);
-            Control.removeProcessTable(_RunningPID);
-            var index = _CpuScheduler.activePIDList.indexOf(_RunningPID);
+        public krnExitProcess(process){
+            process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime; 
+            process.turnaroundTime = process.turnaroundTime + process.waitTime;
+            _StdOut.nextLine();
+            _StdOut.putText("Process id " + process.pid + " finished.");
+            _StdOut.nextLine();
+            _StdOut.putText("The turnaround time was " + process.turnaroundTime + " ticks.");
+            _StdOut.nextLine();
+            _StdOut.putText("The wait time was " + process.waitTime + " ticks.");
+            _StdOut.nextLine();
+            _OsShell.putPrompt();
+            _MemoryManager.clearPartition(process.pBase);
+            Control.removeProcessTable(process.pid);
+            var index = _CpuScheduler.activePIDList.indexOf(process.pid);
             _CpuScheduler.activePIDList.splice(index, 1);
-            _CpuScheduler.currCycle = _CpuScheduler.quantum;
-            _CpuScheduler.checkSchedule();
+            if ( _CpuScheduler.activePIDList.length == 0){
+                _CpuScheduler.checkSchedule();
+            }
+            else {
+                _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            }
         }
         // - WaitForProcessToExit
         // - CreateFile
@@ -282,17 +300,17 @@ module TSOS {
             this.krnShutdown();
         }
 
-        public contextSwitch(){
+        public contextSwitch(runningProcess){
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(_RunningpBase, _RunningPID);
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
-                currProcess.pState = "Resident";
+                currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                Control.updateProcessTable(_RunningPID, currProcess.pState);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
             var nextProcess = _ReadyQueue.dequeue();
             _CPU.PC = nextProcess.pCounter;
@@ -301,40 +319,41 @@ module TSOS {
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
-            _RunningPID = nextProcess.pid;
-            _RunningpBase = nextProcess.pBase;        
-            Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+            _CpuScheduler.runningProcess = nextProcess; 
+            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
+            _CpuScheduler.currCycle = 0;
         }
 
         public killProcess(pid){
             var process;
             var index = _CpuScheduler.activePIDList.indexOf(parseInt(pid));
              if (index == -1){
-                _StdOut.putText("No process " + pid + " is active"); 
+                _StdOut.putText("No process " + pid + " is active");
+                _StdOut.nextLine();
                 _OsShell.putPrompt();
-            } else {
-                if (pid == _RunningPID){
-                    this.krnExitProcess();
-                    _CPU.IR = "00";
-                } else {
+            }
+            else {
+                if (pid == _CpuScheduler.runningProcess.pid){
+                    this.krnExitProcess(_CpuScheduler.runningProcess);
+                }
+                else {
                     for (var i=0; i<_ReadyQueue.getSize(); i++){
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid){
-                            var pBase = process.pBase;
+                            this.krnExitProcess(process);
                             break;
-                        } else {
+                        }
+                        else {
                             _ReadyQueue.enqueue(process);
                         }
                     }
                 }
-                Control.removeProcessTable(pid);
-                _MemoryManager.clearPartition(pBase);
-                _CpuScheduler.activePIDList.splice(index, 1);
-                _StdOut.putText("Process " + pid + " has been killed");
-                _StdOut.advanceLine();
-                _CpuScheduler.currCycle = _CpuScheduler.quantum;
-                _CpuScheduler.checkSchedule(); 
             }
+        }
+
+        public memoryAccessError(pid){
+            _StdOut.putText("Memory access error from process " + pid);
+            this.krnExitProcess(_CpuScheduler.runningProcess);
         }
 
     }

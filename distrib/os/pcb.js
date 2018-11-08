@@ -1,7 +1,7 @@
 var TSOS;
 (function (TSOS) {
     var PCB = /** @class */ (function () {
-        function PCB(pBase, pid) {
+        function PCB(pBase, pid, pState) {
             this.pCounter = 0; //points to instructions
             //public pIR: string = "00";
             this.pAcc = 0;
@@ -9,11 +9,12 @@ var TSOS;
             this.pYreg = 0;
             this.pZflag = 0;
             this.pPriority = 0;
-            this.pState = "New";
             this.pLocation = "Memory";
+            this.turnaroundTime = 0;
+            this.waitTime = 0;
             this.pBase = pBase;
             this.pid = pid;
-            this.pState = "Resident";
+            this.pState = pState;
             this.pLimit = 255;
         }
         return PCB;

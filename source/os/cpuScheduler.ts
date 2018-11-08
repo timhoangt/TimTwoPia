@@ -9,28 +9,31 @@ module TSOS {
         public quantum = 6;
         public currCycle = 0;
         public activePIDList = new Array<number>();
+        public totalCycles = 0;
+        public runningProcess;
 
         public start(): void {
             this.currCycle = 0;
-            var process = _ReadyQueue.dequeue();
-            process.pState = "Running";
-            Control.updateProcessTable(process.pid, process.pState);
-            _RunningPID = process.pid;
-            _RunningpBase = process.pBase;
+            this.totalCycles = 0;
+            this.runningProcess = _ReadyQueue.dequeue();
+            this.runningProcess.pState = "Running";
+            _CPU.isExecuting = true;
+            Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
         }
 
         public checkSchedule(): void {
-            this.currCycle++;
-            if (this.currCycle > this.quantum){
-                if (!_ReadyQueue.isEmpty()){
-                    _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
+            if (this.activePIDList.length == 0){
+                    _CPU.init();
+            }
+            else {
+                this.currCycle++;
+                this.runningProcess.turnaroundTime++;
+                this.totalCycles++;
+                if (this.currCycle >= this.quantum){
+                    if (!_ReadyQueue.isEmpty()){
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
+                    }
                 }
-                else {
-	                if(_CPU.IR == "00"){
-	                    _CPU.init();
-	                }
-	            }
-                this.currCycle = 0;
             }
         }
 	}

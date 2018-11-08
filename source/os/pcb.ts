@@ -8,15 +8,17 @@ module TSOS {
         public pYreg: number = 0;
         public pZflag: number = 0; 
         public pPriority: number = 0;
-        public pState: string = "New";
+        public pState: string;
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
+        public turnaroundTime: number = 0;
+        public waitTime: number = 0;
 
-        constructor(pBase, pid) { //assigns values to process
+        constructor(pBase, pid, pState) { //assigns values to process
             this.pBase = pBase;
             this.pid = pid;
-            this.pState = "Resident";
+            this.pState = pState;
             this.pLimit = 255;
         }
     }

@@ -11,27 +11,29 @@ var TSOS;
             this.quantum = 6;
             this.currCycle = 0;
             this.activePIDList = new Array();
+            this.totalCycles = 0;
         }
         CpuScheduler.prototype.start = function () {
             this.currCycle = 0;
-            var process = _ReadyQueue.dequeue();
-            process.pState = "Running";
-            TSOS.Control.updateProcessTable(process.pid, process.pState);
-            _RunningPID = process.pid;
-            _RunningpBase = process.pBase;
+            this.totalCycles = 0;
+            this.runningProcess = _ReadyQueue.dequeue();
+            this.runningProcess.pState = "Running";
+            _CPU.isExecuting = true;
+            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
         };
         CpuScheduler.prototype.checkSchedule = function () {
-            this.currCycle++;
-            if (this.currCycle > this.quantum) {
-                if (!_ReadyQueue.isEmpty()) {
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
-                }
-                else {
-                    if (_CPU.IR == "00") {
-                        _CPU.init();
+            if (this.activePIDList.length == 0) {
+                _CPU.init();
+            }
+            else {
+                this.currCycle++;
+                this.runningProcess.turnaroundTime++;
+                this.totalCycles++;
+                if (this.currCycle >= this.quantum) {
+                    if (!_ReadyQueue.isEmpty()) {
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                 }
-                this.currCycle = 0;
             }
         };
         return CpuScheduler;

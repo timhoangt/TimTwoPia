@@ -375,7 +375,16 @@ var TSOS;
             }
         };
         Shell.prototype.shellClearmem = function (args) {
-            _MemoryManager.clearMemory();
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Cannot clear memory. A process is currently running. Use kill command to terminate process.");
+            }
+            else {
+                _MemoryManager.clearMemory();
+                TSOS.Control.removeProcessTable(-1);
+                while (!_ResidentQueue.isEmpty()) {
+                    _ResidentQueue.dequeue();
+                }
+            }
         };
         Shell.prototype.shellRunall = function (args) {
             if (_ResidentQueue.isEmpty()) {

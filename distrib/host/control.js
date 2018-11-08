@@ -168,8 +168,12 @@ var TSOS;
         Control.updateProcessTable = function (pid, pState) {
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if (pc.length == 1) {
+                pc = "0" + pc;
+            }
             //updates PC, IR, ACC, X, Y, Z, State
-            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            row.cells.item(1).innerHTML = pc;
             row.cells.item(2).innerHTML = _CPU.IR;
             row.cells.item(3).innerHTML = _CPU.Acc.toString(16);
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16);
@@ -180,14 +184,25 @@ var TSOS;
         Control.removeProcessTable = function (pid) {
             //after program is complete, table is cleared
             var processTableBody = document.getElementById("processTbody");
-            var row = document.getElementById("pid" + pid);
-            row.parentNode.removeChild(row);
+            if (pid == -1) {
+                while (processTableBody.hasChildNodes()) {
+                    processTableBody.removeChild(processTableBody.firstChild);
+                }
+            }
+            else {
+                var row = document.getElementById("pid" + pid);
+                row.parentNode.removeChild(row);
+            }
         };
         //continuously runs when process is running
         Control.updateCPU = function () {
             var cpuTable = document.getElementById("taCPU");
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if (pc.length == 1) {
+                pc = "0" + pc;
+            }
             //updates values in CPU table
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = pc;
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16);
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16);
@@ -264,7 +279,6 @@ var TSOS;
             // ... Create and initialize the Memory
             _Memory = new TSOS.Memory(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();
-            Control.loadMemoryTable();
             //initialize memory accessor
             _MemoryAccessor = new TSOS.MemoryAccessor();
             _MemoryAccessor.init();
@@ -305,7 +319,10 @@ var TSOS;
             if (_CPU.isExecuting) {
                 _CPU.cycle();
                 Control.updateCPU();
-                Control.updateProcessTable(_RunningPID, "Running");
+                if (_CPU.IR !== "00") {
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                }
+                _CpuScheduler.checkSchedule();
             }
         };
         Control.hostBtnNextStep_onOff = function () {

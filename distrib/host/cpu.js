@@ -123,7 +123,7 @@ var TSOS;
                         break;
                     //Break (which is really a system call) 
                     case "00":
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         if (_SingleStep) {
                             TSOS.Control.hostBtnNextStep_onOff();
                         }
@@ -190,7 +190,7 @@ var TSOS;
                         break;
                     default:
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, opCode));
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         this.init();
                         break;
                 }
