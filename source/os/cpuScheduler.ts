@@ -6,13 +6,13 @@
 module TSOS {
 	export class CpuScheduler {
 		public algorithm = "Round Robin";
-        public quantum = 6;
+        public quantum = 6; //the quantum value
         public currCycle = 0;
         public activePIDList = new Array<number>();
-        public totalCycles = 0;
+        public totalCycles = 0; //how many cycles the program has been running
         public runningProcess;
 
-        public start(): void {
+        public start(): void { //starting the first program in a batch
             this.currCycle = 0;
             this.totalCycles = 0;
             this.runningProcess = _ReadyQueue.dequeue();
@@ -22,15 +22,15 @@ module TSOS {
         }
 
         public checkSchedule(): void {
-            if (this.activePIDList.length == 0){
+            if (this.activePIDList.length == 0){ //if there are multiple programs running at once
                     _CPU.init();
             }
             else {
-                this.currCycle++;
+                this.currCycle++; //add a cycle
                 this.runningProcess.turnaroundTime++;
                 this.totalCycles++;
-                if (this.currCycle >= this.quantum){
-                    if (!_ReadyQueue.isEmpty()){
+                if (this.currCycle >= this.quantum){ //when the quantum has been reached
+                    if (!_ReadyQueue.isEmpty()){ //if there are more processes do a context switch
                         _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                 }

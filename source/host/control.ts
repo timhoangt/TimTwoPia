@@ -354,19 +354,20 @@ module TSOS {
         }
 
         public static hostBtnSingle_click(btn): void {
-            _SingleStep = !(_SingleStep);
-            if (_SingleStep){
+            _SingleStep = !(_SingleStep); //if single step mode button is clicked
+            if (_SingleStep){ //if its avtivated
                 btn.style.backgroundColor = "lime";
                 btn.style.color = "black";
-                this.hostBtnNextStep_onOff();      
+                this.hostBtnNextStep_onOff(); //allow for one step to be done at a time
             }
-            else {
+            else { //disable next step button
                 (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = true;
                 btn.style.backgroundColor = "black";
                 btn.style.color = "lime";
             }         
         }
 
+        //does the next step in the program
         public static hostBtnNextStep_click(btn): void {
             if(_CPU.isExecuting){
                 _CPU.cycle();
@@ -378,13 +379,14 @@ module TSOS {
             }
         }
 
+        //turns single step mode on and off
         public static hostBtnNextStep_onOff(): void {
-            if(_CPU.isExecuting){
+            if(_CPU.isExecuting){ //if there is a running program allow for next step button to work
                 (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = false;
                 document.getElementById("btnNextStep").style.backgroundColor = "lime";
                 document.getElementById("btnNextStep").style.color = "black";        
             }
-            else {
+            else { //else disable the next step button
                 (<HTMLButtonElement>document.getElementById("btnNextStep")).disabled = true;
                 document.getElementById("btnNextStep").style.backgroundColor = "black";
                 document.getElementById("btnNextStep").style.color = "lime";               

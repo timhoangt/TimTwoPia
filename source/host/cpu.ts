@@ -134,7 +134,8 @@ module TSOS {
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg){
                             this.Zflag = 1;
-                        } else{
+                        }
+                        else{
                             this.Zflag = 0;
                         }
                         this.PC+=3;
@@ -145,11 +146,13 @@ module TSOS {
                             var branch = parseInt(this.fetch(this.PC+1),16) + this.PC;
                             if (branch < 256){
                                 this.PC = branch + 2;
-                            } else{
+                            }
+                            else{
                                 branch = branch%256;
                                 this.PC = branch + 2;
                             }
-                        } else{
+                        }
+                        else{
                             this.PC+=2;  
                         }                      
                         break;
@@ -167,7 +170,8 @@ module TSOS {
                         var str: string = "";
                         if (this.Xreg == 1){
                             str = this.Yreg.toString();
-                        } else if (this.Xreg == 2){
+                        }
+                        else if (this.Xreg == 2){
                             addr = this.Yreg.toString(16);
                             index = parseInt(addr, 16);
                             data = parseInt(this.fetch(index), 16);
@@ -184,7 +188,7 @@ module TSOS {
                         this.PC++;
                         break;
 
-                    default:
+                    default: //if there is a program error, the process is stopped and the invalid opcode is sent
                         _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, opCode));
                         _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         this.init();

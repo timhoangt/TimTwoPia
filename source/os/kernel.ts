@@ -201,6 +201,7 @@ module TSOS {
             var process;
             var switched:boolean = false;
             var pidExists:boolean = false;
+            //all the pids in the resident queue exist
             for (var i=0; i<_ResidentQueue.getSize(); i++){
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid){
@@ -210,24 +211,24 @@ module TSOS {
                 _ResidentQueue.enqueue(process);
                 switched = !switched;
             }
-            if (pidExists){
+            if (pidExists){ //run the process if it exists
                 if (switched){
                     _ResidentQueue.enqueue(_ResidentQueue.dequeue());
                 }
-                process.pState = "Ready";
+                process.pState = "Ready"; //the program is now ready and active
                 _CpuScheduler.activePIDList.push(process.pid);  
                 _ReadyQueue.enqueue(process);
                 Control.updateProcessTable(process.pid, process.pState);
                 _CpuScheduler.start();
             }
-            else {
+            else { //if the process doesnt exist
                 _StdOut.putText("No process with id: " + pid); 
                 _StdOut.nextLine();
             }
         }
 
-        public krnExecuteAllProcess(){
-            var process;
+        public krnExecuteAllProcess(){ //run all processes
+            var process; 
             while (!_ResidentQueue.isEmpty()){
                 process = _ResidentQueue.dequeue();
                 _CpuScheduler.activePIDList.push(process.pid);
@@ -250,10 +251,10 @@ module TSOS {
             _StdOut.putText("The wait time was " + process.waitTime + " ticks.");
             _StdOut.nextLine();
             _OsShell.putPrompt();
-            _MemoryManager.clearPartition(process.pBase);
-            Control.removeProcessTable(process.pid);
-            var index = _CpuScheduler.activePIDList.indexOf(process.pid);
-            _CpuScheduler.activePIDList.splice(index, 1);
+            _MemoryManager.clearPartition(process.pBase); //clears program from memory
+            Control.removeProcessTable(process.pid); //removes program from processs table
+            var index = _CpuScheduler.activePIDList.indexOf(process.pid); //removes from active list
+            _CpuScheduler.activePIDList.splice(index, 1); 
             if ( _CpuScheduler.activePIDList.length == 0){
                 _CpuScheduler.checkSchedule();
             }
@@ -301,7 +302,7 @@ module TSOS {
         }
 
         public contextSwitch(runningProcess){
-            if (_CPU.IR != "00"){
+            if (_CPU.IR != "00"){ //puts process in process control block
                 var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
@@ -312,7 +313,7 @@ module TSOS {
                 _ReadyQueue.enqueue(currProcess);
                 Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
-            var nextProcess = _ReadyQueue.dequeue();
+            var nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -324,19 +325,20 @@ module TSOS {
             _CpuScheduler.currCycle = 0;
         }
 
+        //kills process
         public killProcess(pid){
             var process;
             var index = _CpuScheduler.activePIDList.indexOf(parseInt(pid));
-             if (index == -1){
+             if (index == -1){ //if it doesnt exist
                 _StdOut.putText("No process " + pid + " is active");
                 _StdOut.nextLine();
                 _OsShell.putPrompt();
             }
             else {
-                if (pid == _CpuScheduler.runningProcess.pid){
-                    this.krnExitProcess(_CpuScheduler.runningProcess);
+                if (pid == _CpuScheduler.runningProcess.pid){ //if its running
+                    this.krnExitProcess(_CpuScheduler.runningProcess); //end the program
                 }
-                else {
+                else { //if it exists but isnt running
                     for (var i=0; i<_ReadyQueue.getSize(); i++){
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid){
@@ -351,7 +353,7 @@ module TSOS {
             }
         }
 
-        public memoryAccessError(pid){
+        public memoryAccessError(pid){ //not enough memory for the process
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
         }
