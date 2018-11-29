@@ -5,7 +5,7 @@
      ------------ */
 module TSOS {
 	export class CpuScheduler {
-		public algorithm = "Round Robin";
+		public schedule = "Round Robin";
         public quantum = 6; //the quantum value
         public currCycle = 0;
         public activePIDList = new Array<number>();
@@ -34,6 +34,25 @@ module TSOS {
                         _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                 }
+            }
+        }
+
+        public setSchedule(schedule): void{
+            switch (schedule){
+                case "rr":
+                    this.schedule = "Round Robin";
+                    this.quantum = 6;
+                    break;
+                case "fcfs":
+                    this.schedule = "First-come, First-serve"
+                    this.quantum = 30;
+                    break;
+                case "priority":
+                    this.schedule = "Non-preemptive Priority";
+                    this.quantum = 30;
+                default:
+                    this.quantum = 6;
+                    break;
             }
         }
 	}

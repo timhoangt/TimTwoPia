@@ -50,6 +50,10 @@ module TSOS {
             //
             // ... more?
             //
+            this.krnTrace("Loading the file system device driver");
+            _krnFileSystemDriver = new DeviceDriverFileSystem();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -189,7 +193,7 @@ module TSOS {
         public krnCreateProcess(pBase) {
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid, "Resident");
+            var process = new PCB(pBase, pid, "Resident", 1);
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -303,7 +307,7 @@ module TSOS {
 
         public contextSwitch(runningProcess){
             if (_CPU.IR != "00"){ //puts process in process control block
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -321,7 +325,7 @@ module TSOS {
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess; 
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
+            this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
         }
 
@@ -356,6 +360,27 @@ module TSOS {
         public memoryAccessError(pid){ //not enough memory for the process
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
+        }
+
+        public krnCreateFile(filename){
+            var file = _krnFileSystemDriver.createFile();
+            if(file){
+                _StdOut.putText("Created file:" + "filename");
+            } else{
+                _StdOut.putText("Disk out of storage space");
+            }
+        }
+
+        public krnReadFile(filename){
+         
+        }
+
+        public krnWriteFile(filename){
+        
+        }
+        
+        public krnDeleteFile(filename){
+        
         }
 
     }

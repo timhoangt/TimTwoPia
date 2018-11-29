@@ -85,6 +85,24 @@ var TSOS;
             // kill <id> - kills the specified process id.
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "<pid> - Kills the specified process id.");
             this.commandList[this.commandList.length] = sc;
+            // create <string>
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "<string> - Creates a file with the specified name.");
+            this.commandList[this.commandList.length] = sc;
+            // write <string> "string"
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> - Writes content to specified file.");
+            this.commandList[this.commandList.length] = sc;
+            // read <filename>
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "<string> - Reads content of specified file.");
+            this.commandList[this.commandList.length] = sc;
+            // delete <filename>
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "<string> - Deletes specified file.");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new TSOS.ShellCommand(this.shellLs, "ls", "Lists all files on disk.");
+            this.commandList[this.commandList.length] = sc;
+            // format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "Formats drive.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -175,7 +193,21 @@ var TSOS;
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
         Shell.prototype.shellInvalidCommand = function () {
-            _StdOut.putText("Invalid Command. ");
+            _StdOut.putText("Invalid Command. Here are some suggestions: ");
+            var match = false;
+            var sc = null;
+            var buffer = "";
+            for (var i = 0; (i < _OsShell.commandList.length) && !match; i++) //this checks the commands
+             {
+                sc = _OsShell.commandList[i];
+                if (sc.command.search(buffer) == 0) {
+                    match = true;
+                }
+            }
+            if (match) //when match is true, replace the text
+             {
+                _StdOut.putText(sc.command.substr(buffer.length));
+            }
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
                 _StdOut.nextLine();
@@ -257,6 +289,24 @@ var TSOS;
                         break;
                     case "kill":
                         _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Create followed by a string for filename would create a file with that name.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Write followed by a string for filename and another string in double quotes for file contents would write the contents to the file with that name.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Read followed by a string for filename would print the contents of the file with that name.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("Delete followed by a string for filename would delete the file with that name.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Ls would list the files currently stored on the disk.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -417,6 +467,56 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please enter a valid pID after kill command.");
+            }
+        };
+        Shell.prototype.shellCreate = function (args) {
+            var valText = /^[a-z\d\s]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+            }
+            else {
+                _StdOut.putText("Please only use letters and numbers for the filename.");
+            }
+        };
+        Shell.prototype.shellWrite = function (args) {
+            var valText = /^[a-z\d\s]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+            }
+            else {
+                _StdOut.putText("Please only use letters and numbers for the filename");
+            }
+        };
+        Shell.prototype.shellRead = function (args) {
+            var valText = /^[a-z\d\s]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+            }
+            else {
+                _StdOut.putText("Please only use letters and numbers for the filename");
+            }
+        };
+        Shell.prototype.shellDelete = function (args) {
+            var valText = /^[a-z\d\s]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+            }
+            else {
+                _StdOut.putText("Please only use letters and numbers for the filename");
+            }
+        };
+        Shell.prototype.shellLs = function (args) {
+        };
+        Shell.prototype.shellFormat = function (args) {
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
+            }
+            else {
+                _krnFileSystemDriver.formatDisk();
             }
         };
         return Shell;

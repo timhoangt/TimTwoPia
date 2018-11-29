@@ -15,11 +15,12 @@ module TSOS {
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
 
-        constructor(pBase, pid, pState) { //assigns values to process
+        constructor(pBase, pid, pState, pPriority) { //assigns values to process
             this.pBase = pBase;
             this.pid = pid;
             this.pState = pState;
             this.pLimit = 255;
+            this.pPriority = pPriority;
         }
     }
 } 

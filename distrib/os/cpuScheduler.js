@@ -7,7 +7,7 @@ var TSOS;
 (function (TSOS) {
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
-            this.algorithm = "Round Robin";
+            this.schedule = "Round Robin";
             this.quantum = 6; //the quantum value
             this.currCycle = 0;
             this.activePIDList = new Array();
@@ -34,6 +34,24 @@ var TSOS;
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                 }
+            }
+        };
+        CpuScheduler.prototype.setSchedule = function (schedule) {
+            switch (schedule) {
+                case "rr":
+                    this.schedule = "Round Robin";
+                    this.quantum = 6;
+                    break;
+                case "fcfs":
+                    this.schedule = "First-come, First-serve";
+                    this.quantum = 30;
+                    break;
+                case "priority":
+                    this.schedule = "Non-preemptive Priority";
+                    this.quantum = 30;
+                default:
+                    this.quantum = 6;
+                    break;
             }
         };
         return CpuScheduler;
