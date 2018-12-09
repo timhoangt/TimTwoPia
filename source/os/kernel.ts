@@ -268,9 +268,34 @@ module TSOS {
         }
         // - WaitForProcessToExit
         // - CreateFile
+        public krnCreateFile(filename){
+            var fileCreated = _krnFileSystemDriver.createFile(filename);
+            if(fileCreated){
+                _StdOut.putText("Created file:" + filename);
+            }
+            else{
+                _StdOut.putText("Disk out of storage space");
+            }
+        }
         // - OpenFile
         // - ReadFile
+        public krnReadFile(filename){
+ 
+        }
         // - WriteFile
+        public krnWriteFile(filename, fileContent){
+            var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
+            if(fileWritten){
+                _StdOut.putText("Wrote to file:" + filename);
+            }
+            else{
+                _StdOut.putText("ERROR");
+            }
+        }
+
+        public krnDeleteFile(filename){
+ 
+        }
         // - CloseFile
 
 
@@ -360,27 +385,6 @@ module TSOS {
         public memoryAccessError(pid){ //not enough memory for the process
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
-        }
-
-        public krnCreateFile(filename){
-            var file = _krnFileSystemDriver.createFile();
-            if(file){
-                _StdOut.putText("Created file:" + "filename");
-            } else{
-                _StdOut.putText("Disk out of storage space");
-            }
-        }
-
-        public krnReadFile(filename){
-         
-        }
-
-        public krnWriteFile(filename){
-        
-        }
-        
-        public krnDeleteFile(filename){
-        
         }
 
     }

@@ -247,9 +247,31 @@ var TSOS;
         };
         // - WaitForProcessToExit
         // - CreateFile
+        Kernel.prototype.krnCreateFile = function (filename) {
+            var fileCreated = _krnFileSystemDriver.createFile(filename);
+            if (fileCreated) {
+                _StdOut.putText("Created file:" + filename);
+            }
+            else {
+                _StdOut.putText("Disk out of storage space");
+            }
+        };
         // - OpenFile
         // - ReadFile
+        Kernel.prototype.krnReadFile = function (filename) {
+        };
         // - WriteFile
+        Kernel.prototype.krnWriteFile = function (filename, fileContent) {
+            var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
+            if (fileWritten) {
+                _StdOut.putText("Wrote to file:" + filename);
+            }
+            else {
+                _StdOut.putText("ERROR");
+            }
+        };
+        Kernel.prototype.krnDeleteFile = function (filename) {
+        };
         // - CloseFile
         //
         // OS Utility Routines
@@ -333,21 +355,6 @@ var TSOS;
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
-        };
-        Kernel.prototype.krnCreateFile = function (filename) {
-            var file = _krnFileSystemDriver.createFile();
-            if (file) {
-                _StdOut.putText("Created file:" + "filename");
-            }
-            else {
-                _StdOut.putText("Disk out of storage space");
-            }
-        };
-        Kernel.prototype.krnReadFile = function (filename) {
-        };
-        Kernel.prototype.krnWriteFile = function (filename) {
-        };
-        Kernel.prototype.krnDeleteFile = function (filename) {
         };
         return Kernel;
     }());

@@ -68,4 +68,5 @@ var Glados = null; // This is the function Glados() in glados.js on Labouseur.co
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
+    TSOS.Control.loadDiskTable();
 };

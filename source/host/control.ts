@@ -211,6 +211,48 @@ module TSOS {
             row.cells.item(7).innerHTML = pState;
         }
 
+        public static loadDiskTable(): void {
+            var diskContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("fsContainer");
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
+            diskTable.className = "tbFS";
+            diskTable.id = "tbFS";
+            diskTable.className = "tableStyle";
+            var diskTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            
+            for (var i = 0; i < sessionStorage.length; i++){
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+                var tsb:string = sessionStorage.key(i).toString();
+                var value = new Array<string>();
+                row.id = tsb;
+                var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+                var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" +tsb.charAt(2));
+                cell.appendChild(cellText);
+                row.appendChild(cell);        
+                value = JSON.parse(sessionStorage.getItem(tsb));
+
+                var firstByte: string = value[0];                
+                cell = document.createElement("td");
+                cellText = document.createTextNode(firstByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+
+                var pointerByte: string = value.splice(1,3).toString().replace(/,/g,""); 
+                cell = document.createElement("td");
+                cellText = document.createTextNode(pointerByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+
+                var dataBytes: string = value.toString().replace(/,/g,"");  
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBytes);
+                cell.appendChild(cellText);
+                row.appendChild(cell);            
+                diskTableBody.appendChild(row);
+            }
+            diskTable.appendChild(diskTableBody);
+            diskContainer.appendChild(diskTable);
+        }
+
         public static removeProcessTable(pid): void{
             //after program is complete, table is cleared
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
@@ -250,7 +292,7 @@ module TSOS {
              // Update status bar
             var taStatus = <HTMLInputElement> document.getElementById("taStatus");
             taStatus.value = msg;
-            }
+        }
 
         public static Time(msg: string, source: string = "?"): void {
             /*var today = new Date();
