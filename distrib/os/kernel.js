@@ -263,6 +263,8 @@ var TSOS;
             _StdOut.putText(returnMsg);
         };
         Kernel.prototype.krnDeleteFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.deleteFile(filename);
+            _StdOut.putText(returnMsg);
         };
         // - CloseFile
         //

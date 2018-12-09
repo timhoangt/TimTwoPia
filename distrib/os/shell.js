@@ -528,10 +528,11 @@ var TSOS;
             }
         };
         Shell.prototype.shellDelete = function (args) {
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename;
             if (valText.test(args)) {
                 filename = args;
+                _Kernel.krnDeleteFile(filename);
             }
             else {
                 _StdOut.putText("Only letters can be used for the filename.");

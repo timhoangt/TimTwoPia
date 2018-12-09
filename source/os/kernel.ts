@@ -285,7 +285,8 @@ module TSOS {
         }
 
         public krnDeleteFile(filename){
- 
+            var returnMsg = _krnFileSystemDriver.deleteFile(filename);
+            _StdOut.putText(returnMsg);
         }
         // - CloseFile
 
