@@ -89,7 +89,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellCreate, "create", "<string> - Creates a file with the specified name.");
             this.commandList[this.commandList.length] = sc;
             // write <string> "string"
-            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> - Writes content to specified file.");
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> \"string\" - Writes data within \"\" to file.");
             this.commandList[this.commandList.length] = sc;
             // read <filename>
             sc = new TSOS.ShellCommand(this.shellRead, "read", "<string> - Reads content of specified file.");
@@ -487,24 +487,29 @@ var TSOS;
         };
         Shell.prototype.shellWrite = function (args) {
             var valName = /^[a-z\d]+$/i;
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z\d\s\"]+$/i;
             var filename;
             var fileContent;
-            console.log(args[0]);
             if (valName.test(args[0])) {
                 filename = args[0];
-                _StdOut.putText(filename);
-                fileContent = args[1];
-                if (fileContent.charAt(0) != '"' && fileContent.charAt(fileContent.length - 1) != '"') {
-                    _StdOut.putText("File content must be in double quotes");
-                }
-                else if (!valText.test(fileContent)) {
-                    _StdOut.putText("Only use letters, numbers, and spaces for file's contents");
+                if (args.length < 2) {
+                    _StdOut.putText("The written content must be encased in double quotes");
                 }
                 else {
-                    fileContent = fileContent.slice(1, fileContent.length - 1);
-                    _StdOut.putText(" " + fileContent);
-                    _Kernel.krnWriteFile(filename, fileContent);
+                    fileContent = args[1];
+                    for (var i = 2; i < args.length; i++) {
+                        fileContent = fileContent + " " + args[i];
+                    }
+                    if (fileContent.charAt(0) != '"' || fileContent.charAt(fileContent.length - 1) != '"') {
+                        _StdOut.putText("File content must be in double quotes");
+                    }
+                    else if (!valText.test(fileContent)) {
+                        _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                    }
+                    else {
+                        fileContent = fileContent.slice(1, fileContent.length - 1);
+                        _Kernel.krnWriteFile(filename, fileContent);
+                    }
                 }
             }
             else {

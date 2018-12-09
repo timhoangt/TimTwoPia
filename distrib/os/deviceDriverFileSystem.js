@@ -36,8 +36,11 @@ var TSOS;
                 if (sessionStorage.length == 0) {
                     var tsb;
                     var value = new Array();
-                    while (value.length < 65) {
+                    for (var i = 0; i < 4; i++) {
                         value.push("0");
+                    }
+                    while (value.length < 64) {
+                        value.push("00");
                     }
                     for (var i = 0; i < 8; i++) {
                         for (var j = 0; j < 78; j++) {
@@ -67,35 +70,50 @@ var TSOS;
                 sessionStorage.setItem(tsb, JSON.stringify(value));
             }
         };
+        DeviceDriverFileSystem.prototype.zeroFill = function (tsb) {
+            var value = value = JSON.parse(sessionStorage.getItem(tsb));
+            for (var i = 0; i < 4; i++) {
+                value[i] = "0";
+            }
+            for (var j = 4; j < value.length; j++) {
+                value[j] = "00";
+            }
+        };
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
             var createdFile = false;
             var dirTSB;
             var value = new Array();
             var asciiFilename;
-            var sessionLength = sessionStorage.length;
-            for (var i = 1; i < 78; i++) {
-                var dirTSB = sessionStorage.key(i);
-                value = JSON.parse(sessionStorage.getItem(dirTSB));
-                if (value[0] == "0") {
-                    var dataTSB = this.findDataTSB();
-                    if (dataTSB != null) {
-                        value[0] = "1";
-                        for (var k = 1; k < 4; k++) {
-                            value[k] = "0" + dataTSB.charAt(k - 1);
+            var existFilename = this.lookupDataTSB(filename);
+            if (existFilename) {
+                return "ERROR! A file with that name already exists!";
+            }
+            else {
+                for (var i = 1; i < 78; i++) {
+                    var dirTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(dirTSB));
+                    if (value[0] == "0") {
+                        var dataTSB = this.findDataTSB();
+                        if (dataTSB != null) {
+                            value[0] = "1";
+                            for (var k = 1; k < 4; k++) {
+                                value[k] = dataTSB.charAt(k - 1);
+                            }
+                            asciiFilename = filename.toString();
+                            for (var j = 0; j < asciiFilename.length; j++) {
+                                value[j + 4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
+                            }
+                            sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                            TSOS.Control.updateDiskTable(dirTSB);
+                            return filename + " - File created";
                         }
-                        asciiFilename = filename.toString();
-                        for (var j = 0; j < asciiFilename.length; j++) {
-                            value[j + 4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
+                        else {
+                            return "ERROR! Disk is full!";
                         }
-                        sessionStorage.setItem(dirTSB, JSON.stringify(value));
-                        return true;
-                    }
-                    else {
-                        return false;
                     }
                 }
             }
-            return false;
+            return "ERROR! Directory is full!";
         };
         DeviceDriverFileSystem.prototype.findDataTSB = function () {
             var dataTSB;
@@ -110,6 +128,103 @@ var TSOS;
                 }
             }
             return dataTSB;
+        };
+        DeviceDriverFileSystem.prototype.lookupDataTSB = function (filename) {
+            var dirTSB;
+            var dataTSB;
+            var value = new Array();
+            var dirFilename = "";
+            for (var i = 1; i < 78; i++) {
+                dirTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(dirTSB));
+                if (value[0] == "1") {
+                    var index = 4;
+                    var letter;
+                    while (value[index] != "00") {
+                        letter = String.fromCharCode(parseInt(value[index], 16));
+                        dirFilename = dirFilename + letter;
+                        index++;
+                    }
+                    if (dirFilename == filename) {
+                        dataTSB = value.splice(1, 3).toString().replace(/,/g, "");
+                        return dataTSB;
+                    }
+                    dirFilename = "";
+                }
+            }
+            return null;
+        };
+        DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
+            var tsbUsed = new Array();
+            var dataTSB = this.lookupDataTSB(filename);
+            var value = new Array();
+            var charCode;
+            if (dataTSB != null) {
+                value = JSON.parse(sessionStorage.getItem(dataTSB));
+                var contentIndex = 0;
+                var valueIndex = 0;
+                var pointer = value[1] + value[2] + value[3];
+                if (pointer == "000") {
+                    valueIndex = 4;
+                    tsbUsed.push(dataTSB);
+                }
+                else {
+                    if (pointer == "-1-1-1") {
+                        tsbUsed.push(dataTSB);
+                    }
+                    else {
+                        while (pointer != "-1-1-1") {
+                            dataTSB = pointer;
+                            tsbUsed.push(dataTSB);
+                            value = JSON.parse(sessionStorage.getItem(dataTSB));
+                            pointer = value[1] + value[2] + value[3];
+                        }
+                    }
+                    for (var i = 4; i < value.length; i++) {
+                        if (value[i] == "00") {
+                            valueIndex = i;
+                            break;
+                        }
+                    }
+                }
+                while (contentIndex < fileContent.length) {
+                    if (valueIndex == 64) {
+                        var oldDataTSB = dataTSB;
+                        dataTSB = this.findDataTSB();
+                        tsbUsed.push(dataTSB);
+                        if (dataTSB != null) {
+                            for (var k = 1; k < 4; k++) {
+                                value[k] = dataTSB.charAt(k - 1);
+                            }
+                            sessionStorage.setItem(oldDataTSB, JSON.stringify(value));
+                            TSOS.Control.updateDiskTable(oldDataTSB);
+                            value = JSON.parse(sessionStorage.getItem(dataTSB));
+                            valueIndex = 4;
+                        }
+                        else {
+                            for (var dataTSB in tsbUsed) {
+                                this.zeroFill(dataTSB);
+                            }
+                            return "ERROR! Disk is full!";
+                        }
+                    }
+                    else {
+                        charCode = fileContent.charCodeAt(contentIndex);
+                        value[valueIndex] = charCode.toString(16).toUpperCase();
+                        contentIndex++;
+                        valueIndex++;
+                    }
+                }
+                for (var k = 1; k < 4; k++) {
+                    value[k] = "-1";
+                }
+                sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                TSOS.Control.updateDiskTable(dataTSB);
+                return filename + " - File written";
+            }
+            else {
+                return "ERROR! File does not exist!";
+            }
         };
         return DeviceDriverFileSystem;
     }(TSOS.DeviceDriver));

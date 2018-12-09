@@ -218,6 +218,24 @@ var TSOS;
             diskTable.appendChild(diskTableBody);
             diskContainer.appendChild(diskTable);
         };
+        Control.updateDiskTable = function (tsb) {
+            var diskTable = document.getElementById("tbFS");
+            var dataBlock = this.breakdownBlock(tsb);
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop();
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
+        };
+        Control.breakdownBlock = function (tsb) {
+            var dataBlock = new Array();
+            var value = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes = value.splice(4, 60).toString().replace(/,/g, "");
+            dataBlock.push(dataBytes);
+            var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
+            dataBlock.push(pointerByte);
+            var firstByte = value.splice(0, 1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;
+        };
         Control.removeProcessTable = function (pid) {
             //after program is complete, table is cleared
             var processTableBody = document.getElementById("processTbody");

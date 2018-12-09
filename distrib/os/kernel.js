@@ -248,13 +248,8 @@ var TSOS;
         // - WaitForProcessToExit
         // - CreateFile
         Kernel.prototype.krnCreateFile = function (filename) {
-            var fileCreated = _krnFileSystemDriver.createFile(filename);
-            if (fileCreated) {
-                _StdOut.putText("Created file:" + filename);
-            }
-            else {
-                _StdOut.putText("Disk out of storage space");
-            }
+            var returnMsg = _krnFileSystemDriver.createFile(filename);
+            _StdOut.putText(returnMsg);
         };
         // - OpenFile
         // - ReadFile
@@ -262,13 +257,8 @@ var TSOS;
         };
         // - WriteFile
         Kernel.prototype.krnWriteFile = function (filename, fileContent) {
-            var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
-            if (fileWritten) {
-                _StdOut.putText("Wrote to file:" + filename);
-            }
-            else {
-                _StdOut.putText("ERROR");
-            }
+            var returnMsg = _krnFileSystemDriver.writeFile(filename, fileContent);
+            _StdOut.putText(returnMsg);
         };
         Kernel.prototype.krnDeleteFile = function (filename) {
         };

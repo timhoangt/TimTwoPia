@@ -253,6 +253,26 @@ module TSOS {
             diskContainer.appendChild(diskTable);
         }
 
+        public static updateDiskTable(tsb): void {
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbFS");
+            var dataBlock = this.breakdownBlock(tsb);            
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();             
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop(); 
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
+         }
+
+        public static breakdownBlock(tsb): string[]{
+            var dataBlock = new Array<string>();
+            var value: string[] = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes: string = value.splice(4,60).toString().replace(/,/g,"");
+            dataBlock.push(dataBytes);
+            var pointerByte: string = value.splice(1,3).toString().replace(/,/g,"");
+            dataBlock.push(pointerByte);
+            var firstByte: string = value.splice(0,1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;       
+        }
+
         public static removeProcessTable(pid): void{
             //after program is complete, table is cleared
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
