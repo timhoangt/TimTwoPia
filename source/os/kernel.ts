@@ -275,7 +275,8 @@ module TSOS {
         // - OpenFile
         // - ReadFile
         public krnReadFile(filename){
- 
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
         }
         // - WriteFile
         public krnWriteFile(filename, fileContent){

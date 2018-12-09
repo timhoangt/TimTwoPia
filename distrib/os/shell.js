@@ -446,7 +446,7 @@ var TSOS;
         };
         Shell.prototype.shellQuantum = function (args) {
             if (_CpuScheduler.activePIDList.length == 0) {
-                _StdOut.putText("No process is active");
+                _StdOut.putText("No process is active.");
             }
             else {
                 _StdOut.putText("Active processes [" + _CpuScheduler.activePIDList.toString() + "]");
@@ -454,7 +454,7 @@ var TSOS;
         };
         Shell.prototype.shellPs = function (args) {
             if (_CpuScheduler.activePIDList.length == 0) {
-                _StdOut.putText("No processes are active");
+                _StdOut.putText("No processes are active.");
             }
             else {
                 _StdOut.putText("Active processes: " + _CpuScheduler.activePIDList.toString());
@@ -482,7 +482,7 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText("Only letters can be used for the filename");
+                _StdOut.putText("Only letters can be used for the filename.");
             }
         };
         Shell.prototype.shellWrite = function (args) {
@@ -493,7 +493,7 @@ var TSOS;
             if (valName.test(args[0])) {
                 filename = args[0];
                 if (args.length < 2) {
-                    _StdOut.putText("The written content must be encased in double quotes");
+                    _StdOut.putText("The written content must be encased in double quotes.");
                 }
                 else {
                     fileContent = args[1];
@@ -501,10 +501,10 @@ var TSOS;
                         fileContent = fileContent + " " + args[i];
                     }
                     if (fileContent.charAt(0) != '"' || fileContent.charAt(fileContent.length - 1) != '"') {
-                        _StdOut.putText("File content must be in double quotes");
+                        _StdOut.putText("File content must be in double quotes.");
                     }
                     else if (!valText.test(fileContent)) {
-                        _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                        _StdOut.putText("Please only use letters, numbers, and spaces for file content.");
                     }
                     else {
                         fileContent = fileContent.slice(1, fileContent.length - 1);
@@ -513,17 +513,18 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText("Only letters can be used for the filename");
+                _StdOut.putText("Only letters can be used for the filename.");
             }
         };
         Shell.prototype.shellRead = function (args) {
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename;
             if (valText.test(args)) {
                 filename = args;
+                _Kernel.krnReadFile(filename);
             }
             else {
-                _StdOut.putText("Only letters can be used for the filename");
+                _StdOut.putText("Only letters can be used for the filename.");
             }
         };
         Shell.prototype.shellDelete = function (args) {
@@ -533,7 +534,7 @@ var TSOS;
                 filename = args;
             }
             else {
-                _StdOut.putText("Only letters can be used for the filename");
+                _StdOut.putText("Only letters can be used for the filename.");
             }
         };
         Shell.prototype.shellLs = function (args) {

@@ -254,6 +254,8 @@ var TSOS;
         // - OpenFile
         // - ReadFile
         Kernel.prototype.krnReadFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
         };
         // - WriteFile
         Kernel.prototype.krnWriteFile = function (filename, fileContent) {

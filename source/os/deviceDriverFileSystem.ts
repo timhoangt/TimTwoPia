@@ -149,7 +149,8 @@ module TSOS {
             }
             return null;
         }
-         public writeFile(filename, fileContent): string{
+
+        public writeFile(filename, fileContent): string{
             var tsbUsed: string[] = new Array<string>();
             var dataTSB: string = this.lookupDataTSB(filename);
             var value = new Array<string>();
@@ -216,6 +217,34 @@ module TSOS {
             sessionStorage.setItem(dataTSB, JSON.stringify(value));
             Control.updateDiskTable(dataTSB);
             return filename + " - File written";
+            }
+            else{
+                return "ERROR! File does not exist!";
+            }
+        }
+
+        public readFile(filename): string{
+            var fileContent:string = "";
+            var dataTSB: string = this.lookupDataTSB(filename);
+            var value = new Array<string>();
+            var pointer: string;
+            var index: number;
+            var charCode: number;
+            if (dataTSB!=null){
+                value = JSON.parse(sessionStorage.getItem(dataTSB));
+                pointer = value[1] + value[2] + value[3];
+                index = 4;
+                while(index<64 && value[index]!="00"){
+                    charCode = parseInt(value[index],16);
+                    fileContent = fileContent + String.fromCharCode(charCode)
+                    index++;
+                    if(index==64 && pointer!="-1-1-1"){
+                        value = JSON.parse(sessionStorage.getItem(pointer));
+                        pointer = value[1] + value[2] + value[3];
+                        index = 4;
+                    }
+                }
+                return fileContent;
             }
             else{
                 return "ERROR! File does not exist!";
