@@ -37,23 +37,29 @@ module TSOS {
             }
         }
 
-        public setSchedule(schedule): void{
-            switch (schedule){
+        public setSchedule(args): string{
+            var returnMsg:string;
+            var newSchedule:string = args.toString();
+            switch(newSchedule){
                 case "rr":
                     this.schedule = "Round Robin";
                     this.quantum = 6;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                     break;
                 case "fcfs":
-                    this.schedule = "First-come, First-serve"
-                    this.quantum = 30;
+                    this.schedule = "First-come, First-serve";
+                    this.quantum = 1000;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                     break;
                 case "priority":
                     this.schedule = "Non-preemptive Priority";
-                    this.quantum = 30;
+                    this.quantum = 1000;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                 default:
                     this.quantum = 6;
-                    break;
+                    returnMsg = "CPU scheduling algorithm DNE";
             }
+            return returnMsg;
         }
 	}
 } 

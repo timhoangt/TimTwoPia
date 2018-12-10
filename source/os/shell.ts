@@ -185,6 +185,18 @@ module TSOS {
                 "Formats drive.");
             this.commandList[this.commandList.length] = sc;
 
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                "getschedule",
+                "Shows the current CPU scheduling method.");
+            this.commandList[this.commandList.length] = sc;
+
+             // setschedule <string>
+            sc = new ShellCommand(this.shellSetSchedule,
+                "setschedule",
+                "<string> - Changes the current CPU scheduling method. (rr, fcfs, priority)");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -403,6 +415,12 @@ module TSOS {
                     case "format":
                         _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
                         break;
+                    case "getschedule":
+                        _StdOut.putText("Shows the current CPU scheduling method.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("Changes the current CPU scheduling method. (rr, fcfs, priority)");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -595,7 +613,6 @@ module TSOS {
 
         public shellWrite(args){
             var valName = /^[a-z\d]+$/i;
-            var valText = /^[a-z\d\s\"]+$/i;
             var filename: string;
             var fileContent: string;
             if(valName.test(args[0])){
@@ -610,9 +627,6 @@ module TSOS {
                     }
                     if(fileContent.charAt(0)!='"' || fileContent.charAt(fileContent.length-1)!='"'){
                         _StdOut.putText("File content must be in double quotes.");
-                    }
-                    else if(!valText.test(fileContent)){
-                        _StdOut.putText("Please only use letters, numbers, and spaces for file content.");
                     }
                     else{
                         fileContent = fileContent.slice(1,fileContent.length-1);
@@ -650,6 +664,11 @@ module TSOS {
         }
 
         public shellLs(args){
+            var files: string[] = _krnFileSystemDriver.listFiles();
+            _StdOut.putText("Files: ");
+            for(var file in files){
+                _StdOut.putText(files[file] + "   ");
+            }
         }
 
         public shellFormat(args){
@@ -657,8 +676,16 @@ module TSOS {
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
             else{
-                _krnFileSystemDriver.formatDisk();
+                _StdOut.putText(_krnFileSystemDriver.formatDisk());
             }
+        }
+
+        public shellGetSchedule(args){
+            _StdOut.putText("The current CPU scheduling method is " + _CpuScheduler.schedule);
+        }
+
+        public shellSetSchedule(args){
+            _StdOut.putText(_CpuScheduler.setSchedule(args));
         }
     }
 }

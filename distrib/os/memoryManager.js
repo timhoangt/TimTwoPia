@@ -37,7 +37,9 @@ var TSOS;
                 baseReg = 0;
             }
             //puts program in the partition
-            if (baseReg != 999) {
+            if (baseReg == 999) {
+            }
+            else { // load user program into memory
                 for (var i = 0; i < inputOpCodes.length; i++) {
                     _Memory.memory[baseReg + i] = inputOpCodes[i];
                 }

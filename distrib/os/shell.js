@@ -103,6 +103,12 @@ var TSOS;
             // format
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "Formats drive.");
             this.commandList[this.commandList.length] = sc;
+            // getschedule
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "Shows the current CPU scheduling method.");
+            this.commandList[this.commandList.length] = sc;
+            // setschedule <string>
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "<string> - Changes the current CPU scheduling method. (rr, fcfs, priority)");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -308,6 +314,12 @@ var TSOS;
                     case "format":
                         _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
                         break;
+                    case "getschedule":
+                        _StdOut.putText("Shows the current CPU scheduling method.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("Changes the current CPU scheduling method. (rr, fcfs, priority)");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -487,7 +499,6 @@ var TSOS;
         };
         Shell.prototype.shellWrite = function (args) {
             var valName = /^[a-z\d]+$/i;
-            var valText = /^[a-z\d\s\"]+$/i;
             var filename;
             var fileContent;
             if (valName.test(args[0])) {
@@ -502,9 +513,6 @@ var TSOS;
                     }
                     if (fileContent.charAt(0) != '"' || fileContent.charAt(fileContent.length - 1) != '"') {
                         _StdOut.putText("File content must be in double quotes.");
-                    }
-                    else if (!valText.test(fileContent)) {
-                        _StdOut.putText("Please only use letters, numbers, and spaces for file content.");
                     }
                     else {
                         fileContent = fileContent.slice(1, fileContent.length - 1);
@@ -539,14 +547,25 @@ var TSOS;
             }
         };
         Shell.prototype.shellLs = function (args) {
+            var files = _krnFileSystemDriver.listFiles();
+            _StdOut.putText("Files: ");
+            for (var file in files) {
+                _StdOut.putText(files[file] + "   ");
+            }
         };
         Shell.prototype.shellFormat = function (args) {
             if (_CPU.isExecuting) {
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
             else {
-                _krnFileSystemDriver.formatDisk();
+                _StdOut.putText(_krnFileSystemDriver.formatDisk());
             }
+        };
+        Shell.prototype.shellGetSchedule = function (args) {
+            _StdOut.putText("The current CPU scheduling method is " + _CpuScheduler.schedule);
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            _StdOut.putText(_CpuScheduler.setSchedule(args));
         };
         return Shell;
     }());
