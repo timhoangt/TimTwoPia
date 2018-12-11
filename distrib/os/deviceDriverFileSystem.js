@@ -56,10 +56,11 @@ var TSOS;
                             }
                         }
                     }
+                    TSOS.Control.loadDiskTable();
                 }
             }
             else {
-                alert("Sorry, your browser do not support session storage.");
+                alert("Sorry, session storage is not available.");
             }
         };
         DeviceDriverFileSystem.prototype.formatDisk = function () {
@@ -157,76 +158,83 @@ var TSOS;
             return null;
         };
         DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
-            var tsbUsed = new Array();
             var dataTSB = this.lookupDataTSB(filename);
-            var firstTSB = dataTSB;
-            var value = new Array();
-            var charCode;
+            var content = new Array();
             if (dataTSB != null) {
-                value = JSON.parse(sessionStorage.getItem(dataTSB));
-                var contentIndex = 0;
-                var valueIndex = 0;
-                var firstIndex;
-                var pointer = this.getPointer(value);
-                if (pointer == "000") {
-                    valueIndex = 4;
+                content = this.stringToAsciiHex(fileContent);
+                var fileCreated = this.writeToFS(dataTSB, content);
+                if (fileCreated) {
+                    return filename + " - File written";
                 }
                 else {
-                    while (pointer != "-1-1-1") {
-                        dataTSB = pointer;
-                        tsbUsed.push(dataTSB);
-                        value = JSON.parse(sessionStorage.getItem(dataTSB));
-                        pointer = this.getPointer(value);
-                    }
-                    for (var i = 4; i < value.length; i++) {
-                        if (value[i] == "00") {
-                            valueIndex = i;
-                            break;
-                        }
-                    }
+                    return "ERROR! Disk is full!";
                 }
-                firstIndex = valueIndex;
-                while (contentIndex < fileContent.length) {
-                    if (valueIndex == this.blockSize) {
-                        var oldDataTSB = dataTSB;
-                        dataTSB = this.findDataTSB();
-                        tsbUsed.push(dataTSB);
-                        if (dataTSB != null) {
-                            for (var k = 1; k < 4; k++) {
-                                value[k] = dataTSB.charAt(k - 1);
-                            }
-                            this.updateTSB(oldDataTSB, value);
-                            value = JSON.parse(sessionStorage.getItem(dataTSB));
-                            valueIndex = 4;
-                        }
-                        else {
-                            for (var dataTSB in tsbUsed) {
-                                this.zeroFill(dataTSB);
-                            }
-                            for (var m = firstIndex; m < this.blockSize; m++) {
-                                value = JSON.parse(sessionStorage.getItem(firstTSB));
-                                value[m] = "00";
-                                this.updateTSB(firstTSB, value);
-                            }
-                            return "ERROR! Disk is full!";
-                        }
-                    }
-                    else {
-                        charCode = fileContent.charCodeAt(contentIndex);
-                        value[valueIndex] = charCode.toString(16).toUpperCase();
-                        contentIndex++;
-                        valueIndex++;
-                    }
-                }
-                for (var k = 1; k < 4; k++) {
-                    value[k] = "-1";
-                }
-                this.updateTSB(firstTSB, value);
-                return filename + " - File written";
             }
             else {
                 return "ERROR! File does not exist!";
             }
+        };
+        DeviceDriverFileSystem.prototype.writeToFS = function (dataTSB, content) {
+            var tsbUsed = new Array();
+            var firstTSB = dataTSB;
+            var value = new Array();
+            var valueIndex = 0;
+            var firstIndex;
+            value = JSON.parse(sessionStorage.getItem(dataTSB));
+            var pointer = this.getPointer(value);
+            if (pointer == "000") {
+                valueIndex = 4;
+            }
+            else {
+                while (pointer != "-1-1-1") {
+                    dataTSB = pointer;
+                    tsbUsed.push(dataTSB);
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));
+                    pointer = this.getPointer(value);
+                }
+                for (var i = 4; i < value.length; i++) {
+                    if (value[i] == "00") {
+                        valueIndex = i;
+                        break;
+                    }
+                }
+            }
+            firstIndex = valueIndex;
+            while (content.length > 0) {
+                if (valueIndex == this.blockSize) {
+                    var oldDataTSB = dataTSB;
+                    dataTSB = this.findDataTSB();
+                    tsbUsed.push(dataTSB);
+                    if (dataTSB != null) {
+                        for (var k = 1; k < 4; k++) {
+                            value[k] = dataTSB.charAt(k - 1);
+                        }
+                        this.updateTSB(oldDataTSB, value);
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        valueIndex = 4;
+                    }
+                    else {
+                        for (var tsb in tsbUsed) {
+                            this.zeroFill(tsb);
+                        }
+                        for (var m = firstIndex; m < this.blockSize; m++) {
+                            value = JSON.parse(sessionStorage.getItem(firstTSB));
+                            value[m] = "00";
+                            this.updateTSB(firstTSB, value);
+                        }
+                        return false;
+                    }
+                }
+                else {
+                    value[valueIndex] = content.pop();
+                    valueIndex++;
+                }
+            }
+            for (var k = 1; k < 4; k++) {
+                value[k] = "-1";
+            }
+            this.updateTSB(dataTSB, value);
+            return true;
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
             var fileContent = filename + ": ";
@@ -329,6 +337,35 @@ var TSOS;
                 }
             }
             return (files);
+        };
+        DeviceDriverFileSystem.prototype.stringToAsciiHex = function (string) {
+            var asciiHex = new Array();
+            var hexVal;
+            for (var i = string.length; i >= 0; i--) {
+                hexVal = string.charCodeAt(i).toString(16);
+                asciiHex.push(hexVal);
+            }
+            return asciiHex;
+        };
+        DeviceDriverFileSystem.prototype.writeProcess = function (userPrg) {
+            var dataTSB = this.findDataTSB();
+            var content = new Array();
+            if (dataTSB != null) {
+                while (userPrg.length > 0) {
+                    content.push(userPrg.pop());
+                }
+                var processLoaded = this.writeToFS(dataTSB, content);
+                if (processLoaded) {
+                    var pid = _Kernel.krnCreateProcess(999, dataTSB);
+                    return "Process id: " + pid + " is in Resident Queue";
+                }
+                else {
+                    return "ERROR! Disk is full!";
+                }
+            }
+            else {
+                return "ERROR! Disk is full!";
+            }
         };
         return DeviceDriverFileSystem;
     }(TSOS.DeviceDriver));

@@ -14,13 +14,15 @@ module TSOS {
         public pLimit: number;
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
+        public tsb: string;
 
-        constructor(pBase, pid, pState, pPriority) { //assigns values to process
+        constructor(pBase, pid, pState, pPriority, tsb) { //assigns values to process
             this.pBase = pBase;
             this.pid = pid;
             this.pState = pState;
             this.pLimit = 255;
             this.pPriority = pPriority;
+            this.tsb = tsb;
         }
     }
 } 

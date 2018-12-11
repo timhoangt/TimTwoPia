@@ -51,14 +51,15 @@ module TSOS {
                             }
                         }
                     }
+                    Control.loadDiskTable();
                 }
             }
             else{
-                alert("Sorry, your browser do not support session storage.");
+                alert("Sorry, session storage is not available.");
             }
         }
 
-        public formatDisk(){
+        public formatDisk(): string{
             var tsb: string;
             var value = new Array<string>();
             for (var i=0; i<sessionStorage.length;i++){
@@ -159,76 +160,84 @@ module TSOS {
         }
 
         public writeFile(filename, fileContent): string{
-            var tsbUsed: string[] = new Array<string>();
             var dataTSB: string = this.lookupDataTSB(filename);
-            var firstTSB: string = dataTSB;
-            var value = new Array<string>();
-            var charCode;
+            var content = new Array<string>();
             if(dataTSB != null){
-                value = JSON.parse(sessionStorage.getItem(dataTSB));
-                var contentIndex: number = 0;
-                var valueIndex: number = 0;
-                var firstIndex: number;
-                var pointer: string = this.getPointer(value);
-                if (pointer == "000"){
-                    valueIndex = 4;                     
+                content = this.stringToAsciiHex(fileContent);
+                var fileCreated = this.writeToFS(dataTSB, content);
+                if (fileCreated){
+                    return filename + " - File written";
                 }
-                else {
-                    while(pointer!="-1-1-1"){
-                        dataTSB = pointer;
-                        tsbUsed.push(dataTSB);
-                        value = JSON.parse(sessionStorage.getItem(dataTSB));      
-                        pointer = this.getPointer(value); 
-                    }
-                    for(var i=4; i<value.length; i++){
-                        if(value[i]=="00"){
-                            valueIndex = i;
-                            break;
-                        }
-                    }
+                else{
+                    return "ERROR! Disk is full!";
                 }
-                firstIndex = valueIndex;
-                while(contentIndex<fileContent.length){
-                    if(valueIndex == this.blockSize){
-                        var oldDataTSB: string = dataTSB;
-                        dataTSB = this.findDataTSB();
-                        tsbUsed.push(dataTSB);
-                        if(dataTSB!=null){
-                            for (var k=1; k<4; k++){
-                                value[k] = dataTSB.charAt(k-1);
-                            }
-                            this.updateTSB(oldDataTSB,value);
-                            value = JSON.parse(sessionStorage.getItem(dataTSB));
-                            valueIndex = 4;
-                        }
-                        else{
-                            for (var dataTSB in tsbUsed){
-                                this.zeroFill(dataTSB);
-                            }
-                            for (var m=firstIndex; m<this.blockSize; m++){
-                                value = JSON.parse(sessionStorage.getItem(firstTSB));
-                                value[m] = "00";
-                                this.updateTSB(firstTSB,value);
-                            }
-                            return "ERROR! Disk is full!";
-                        }
-                    }
-                    else{
-                        charCode = fileContent.charCodeAt(contentIndex);
-                        value[valueIndex] = charCode.toString(16).toUpperCase();
-                        contentIndex++;
-                        valueIndex++;
-                    }
-                }
-                for (var k=1; k<4; k++){
-                value[k] = "-1";
             }
-            this.updateTSB(firstTSB,value);
-            return filename + " - File written";
-            }
-            else{
+            else {
                 return "ERROR! File does not exist!";
             }
+        }
+
+        public writeToFS(dataTSB, content): boolean{
+            var tsbUsed: string[] = new Array<string>();
+            var firstTSB: string = dataTSB;
+            var value = new Array<string>();
+            var valueIndex: number = 0;
+            var firstIndex: number;
+            value = JSON.parse(sessionStorage.getItem(dataTSB));
+            var pointer: string = this.getPointer(value);
+            if (pointer == "000"){
+                valueIndex = 4;
+            }
+            else {
+                while(pointer!="-1-1-1"){
+                    dataTSB = pointer;
+                    tsbUsed.push(dataTSB);
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));      
+                    pointer = this.getPointer(value);                         
+                }
+                for(var i=4; i<value.length; i++){
+                    if(value[i]=="00"){
+                        valueIndex = i;
+                        break;
+                    }
+                }
+            }
+            firstIndex = valueIndex;
+            while(content.length>0){
+                if(valueIndex == this.blockSize){
+                    var oldDataTSB: string = dataTSB;
+                    dataTSB = this.findDataTSB();
+                    tsbUsed.push(dataTSB);
+                    if(dataTSB!=null){
+                        for (var k=1; k<4; k++){
+                            value[k] = dataTSB.charAt(k-1);
+                        }
+                        this.updateTSB(oldDataTSB,value);
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        valueIndex = 4;
+                    }
+                    else{
+                        for (var tsb in tsbUsed){
+                            this.zeroFill(tsb);
+                        }
+                        for (var m=firstIndex; m<this.blockSize; m++){
+                            value = JSON.parse(sessionStorage.getItem(firstTSB));
+                            value[m] = "00";
+                            this.updateTSB(firstTSB,value);
+                        }
+                        return false;
+                    }
+                }   
+                else{
+                    value[valueIndex] = content.pop();
+                    valueIndex++;
+                }
+            }
+            for (var k=1; k<4; k++){
+                value[k] = "-1";
+            }
+            this.updateTSB(dataTSB,value);
+            return true;
         }
 
         public readFile(filename): string{
@@ -338,6 +347,37 @@ module TSOS {
                 }
             }
             return(files);
+        }
+
+        public stringToAsciiHex(string): string[]{
+            var asciiHex= new Array<string>();
+            var hexVal:string;
+            for(var i=string.length; i>=0; i--){
+                hexVal = string.charCodeAt(i).toString(16);
+                asciiHex.push(hexVal);
+            }
+            return asciiHex;
+        }
+
+        public writeProcess(userPrg): string{
+            var dataTSB: string = this.findDataTSB();
+            var content = new Array<string>();
+            if(dataTSB != null){
+                while(userPrg.length>0){
+                    content.push(userPrg.pop());
+                }
+                var processLoaded = this.writeToFS(dataTSB, content);
+                if (processLoaded){
+                    var pid: number = _Kernel.krnCreateProcess(999, dataTSB);
+                    return "Process id: " + pid + " is in Resident Queue";
+                }
+                else{
+                    return "ERROR! Disk is full!";
+                }
+            }
+            else {
+                return "ERROR! Disk is full!";
+            }
         }
     }
 }

@@ -172,10 +172,10 @@ var TSOS;
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        Kernel.prototype.krnCreateProcess = function (pBase) {
+        Kernel.prototype.krnCreateProcess = function (pBase, tsb) {
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident", 1);
+            var process = new TSOS.PCB(pBase, pid, "Resident", 1, tsb);
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -298,7 +298,7 @@ var TSOS;
         };
         Kernel.prototype.contextSwitch = function (runningProcess) {
             if (_CPU.IR != "00") { //puts process in process control block
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
+                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -349,6 +349,10 @@ var TSOS;
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
+        };
+        Kernel.prototype.krnWriteProcess = function (inputOpCodes) {
+            var returnMsg = _krnFileSystemDriver.writeProcess(inputOpCodes);
+            return returnMsg;
         };
         return Kernel;
     }());

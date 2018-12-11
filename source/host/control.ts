@@ -218,33 +218,31 @@ module TSOS {
             diskTable.id = "tbFS";
             diskTable.className = "tableStyle";
             var diskTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
-            
+            var tsb:string;
+
             for (var i = 0; i < sessionStorage.length; i++){
                 var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
-                var tsb:string = sessionStorage.key(i).toString();
-                var value = new Array<string>();
+                tsb = sessionStorage.key(i).toString();
+                var dataBlock = this.breakdownBlock(tsb);
                 row.id = tsb;
                 var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+
                 var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" +tsb.charAt(2));
                 cell.appendChild(cellText);
                 row.appendChild(cell);        
-                value = JSON.parse(sessionStorage.getItem(tsb));
 
-                var firstByte: string = value[0];                
                 cell = document.createElement("td");
-                cellText = document.createTextNode(firstByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
-                row.appendChild(cell);
+                row.appendChild(cell);  
 
-                var pointerByte: string = value.splice(1,3).toString().replace(/,/g,""); 
                 cell = document.createElement("td");
-                cellText = document.createTextNode(pointerByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
-                row.appendChild(cell);
+                row.appendChild(cell); 
 
-                var dataBytes: string = value.toString().replace(/,/g,"");  
                 cell = document.createElement("td");
-                cellText = document.createTextNode(dataBytes);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);            
                 diskTableBody.appendChild(row);

@@ -61,6 +61,16 @@ h3 {
   background-color: black;
 }
 
+.fileContainer {
+  width: 1200px;
+  height: 250px;
+  border: 2px solid white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: nowrap;
+  background-color: black;
+}
+
 #taHostLog{
   color: lime;
   font-weight: normal;
@@ -122,6 +132,14 @@ h3 {
 }
 
 #taProcess{
+  color: lime;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
+}
+
+#divFileSystem{
   color: lime;
   font-weight: normal;
   width: 100%;

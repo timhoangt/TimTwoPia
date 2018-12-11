@@ -406,10 +406,11 @@ var TSOS;
                 else {
                     var baseReg = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999) {
-                        _StdOut.putText("Memory is full.");
+                        var returnMsg = _Kernel.krnWriteProcess(inputOpCodes);
+                        _StdOut.putText(returnMsg);
                     }
                     else {
-                        var pid = _Kernel.krnCreateProcess(baseReg);
+                        var pid = _Kernel.krnCreateProcess(baseReg, null);
                         _StdOut.putText("pID " + pid + " is in resident Queue");
                     }
                 }
@@ -457,11 +458,12 @@ var TSOS;
             }
         };
         Shell.prototype.shellQuantum = function (args) {
-            if (_CpuScheduler.activePIDList.length == 0) {
-                _StdOut.putText("No process is active.");
+            var valText = /^\d*$/;
+            if (valText.test(args) && args != "") {
+                _CpuScheduler.quantum = args;
             }
             else {
-                _StdOut.putText("Active processes [" + _CpuScheduler.activePIDList.toString() + "]");
+                _StdOut.putText("Quantum value must be an integer.");
             }
         };
         Shell.prototype.shellPs = function (args) {

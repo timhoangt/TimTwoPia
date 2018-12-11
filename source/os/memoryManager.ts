@@ -11,7 +11,7 @@ module TSOS {
         public memoryP2: boolean = false;
         public memoryP3: boolean = false;
 
-         public loadMemory(inputOpCodes){           
+        public loadMemory(inputOpCodes){           
             var baseReg: number;
             //gives id of empty partition
             if (this.memoryP1){
@@ -36,10 +36,7 @@ module TSOS {
                 baseReg = 0;
             }
             //puts program in the partition
-            if(baseReg==999){
-                
-            }
-            else{ // load user program into memory
+            if(baseReg!=999){
                 for (var i = 0; i <inputOpCodes.length; i++){
                     _Memory.memory[baseReg+i] = inputOpCodes[i];
                 }

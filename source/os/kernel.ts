@@ -190,10 +190,10 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        public krnCreateProcess(pBase) {
+        public krnCreateProcess(pBase, tsb) {
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid, "Resident", 1);
+            var process = new PCB(pBase, pid, "Resident", 1, tsb);
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -324,7 +324,7 @@ module TSOS {
 
         public contextSwitch(runningProcess){
             if (_CPU.IR != "00"){ //puts process in process control block
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -377,6 +377,11 @@ module TSOS {
         public memoryAccessError(pid){ //not enough memory for the process
             _StdOut.putText("Memory access error from process " + pid);
             this.krnExitProcess(_CpuScheduler.runningProcess);
+        }
+
+        public krnWriteProcess(inputOpCodes): string{
+            var returnMsg:string = _krnFileSystemDriver.writeProcess(inputOpCodes);
+            return returnMsg;
         }
 
     }
