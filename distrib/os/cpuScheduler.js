@@ -43,7 +43,7 @@ var TSOS;
             }
             this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
-            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
+            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState, "Memory");
         };
         CpuScheduler.prototype.checkSchedule = function () {
             if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
@@ -84,6 +84,7 @@ var TSOS;
                 default:
                     returnMsg = "CPU scheduling algorithm is: " + this.schedule;
             }
+            TSOS.Control.updateDisplaySchedule(this.schedule);
             return returnMsg;
         };
         CpuScheduler.prototype.sortPriority = function () {

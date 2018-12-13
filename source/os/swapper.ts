@@ -11,7 +11,7 @@ module TSOS {
             var opCode: string;
             var saveUserPrg: string[] = _MemoryAccessor.retreiveMemory(baseReg, limitReg);
             saveUserPrg = this.trimUserPrg(saveUserPrg);
-            var newTSB:string = _krnFileSystemDriver.saveProcess(saveUserPrg);
+            var newTSB:string = _krnFileSystemDriver.writeProcess(saveUserPrg);
             if (newTSB){
                 _MemoryManager.clearPartition(baseReg);
                 loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);

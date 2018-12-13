@@ -499,15 +499,16 @@ var TSOS;
             }
         };
         Shell.prototype.shellCreate = function (args) {
-            var valText = /^[a-z]+$/i;
+            var valTextReg = /^[a-z]+$/i;
+            var valTextHidden = /^\.[a-z]+$/i;
             var filename;
-            if (valText.test(args)) {
-                filename = args;
-                if (filename.length < 60) {
+            if (args.length < 50) {
+                if (valTextReg.test(args) || valTextHidden.test(args)) {
+                    filename = args;
                     _Kernel.krnCreateFile(filename);
                 }
                 else {
-                    _StdOut.putText("You can only have 60 character max for the file name.");
+                    _StdOut.putText("You can have 50 letters for the filename");
                 }
             }
             else {
@@ -574,6 +575,9 @@ var TSOS;
             if (_CPU.isExecuting) {
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
+            else if (!_ResidentQueue.isEmpty()) {
+                _StdOut.putText("Cannot format disk. A process have been loaded on it.");
+            }
             else {
                 if (args == "quick") {
                     _StdOut.putText(_krnFileSystemDriver.formatDisk());
@@ -583,7 +587,7 @@ var TSOS;
                 }
                 else if (args == "") {
                     _StdOut.putText("Enter quick or full after format.");
-                    _StdOut.advanceLine();
+                    _StdOut.nextLine();
                 }
             }
         };

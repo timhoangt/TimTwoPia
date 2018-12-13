@@ -182,6 +182,11 @@ module TSOS {
             cell.appendChild(cellText);
             row.appendChild(cell);
 
+            cell = document.createElement("td");
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+
             cell = document.createElement("td");            
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
@@ -194,7 +199,7 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pid, pState): void{
+        public static updateProcessTable(pid, pState, pLocation): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
             var pc = _CPU.PC.toString(16).toUpperCase();
@@ -209,6 +214,7 @@ module TSOS {
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16);
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16);
             row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pLocation;
         }
 
         public static loadDiskTable(): void {
@@ -433,7 +439,7 @@ module TSOS {
                 _CPU.cycle();
                 Control.updateCPU();
                 if (_CPU.IR!=="00"){
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 _CpuScheduler.checkSchedule(); 
             }
@@ -451,6 +457,11 @@ module TSOS {
                 document.getElementById("btnNextStep").style.backgroundColor = "black";
                 document.getElementById("btnNextStep").style.color = "lime";               
             }
+        }
+
+        public static updateDisplaySchedule(schedule): void{
+            var scheduleDisplay: HTMLBodyElement = <HTMLBodyElement> document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
         }
     }
 }

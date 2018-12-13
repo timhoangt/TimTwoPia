@@ -156,6 +156,10 @@ var TSOS;
             cell.appendChild(cellText);
             row.appendChild(cell);
             cell = document.createElement("td");
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            cell = document.createElement("td");
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -165,7 +169,7 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pid, pState) {
+        Control.updateProcessTable = function (pid, pState, pLocation) {
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
             var pc = _CPU.PC.toString(16).toUpperCase();
@@ -180,6 +184,7 @@ var TSOS;
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16);
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16);
             row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pLocation;
         };
         Control.loadDiskTable = function () {
             var diskContainer = document.getElementById("fsContainer");
@@ -373,7 +378,7 @@ var TSOS;
                 _CPU.cycle();
                 Control.updateCPU();
                 if (_CPU.IR !== "00") {
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 _CpuScheduler.checkSchedule();
             }
@@ -390,6 +395,10 @@ var TSOS;
                 document.getElementById("btnNextStep").style.backgroundColor = "black";
                 document.getElementById("btnNextStep").style.color = "lime";
             }
+        };
+        Control.updateDisplaySchedule = function (schedule) {
+            var scheduleDisplay = document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
         };
         return Control;
     }());

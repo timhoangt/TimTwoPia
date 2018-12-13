@@ -40,9 +40,9 @@ module TSOS {
                 _CPU.init();
                 }
             }
-                this.runningProcess.pState = "Running";
+            this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
-            Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
+            Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState, "Memory");
         }
 
         public checkSchedule(): void {
@@ -85,6 +85,7 @@ module TSOS {
                 default:
                     returnMsg = "CPU scheduling algorithm is: " + this.schedule;
             }
+            Control.updateDisplaySchedule(this.schedule);
             return returnMsg;
         }
 

@@ -106,7 +106,7 @@ module TSOS {
                     _CPU.cycle();
                     Control.updateCPU();
                     if (_CPU.IR!=="00"){
-                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                     }
                     _CpuScheduler.checkSchedule();    
                 }
@@ -197,6 +197,9 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid, "Resident", priority, tsb);
+            if(tsb!=null){
+                process.pLocation = "Disk";
+            }
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -225,7 +228,7 @@ module TSOS {
                 process.pState = "Ready"; //the program is now ready and active
                 _CpuScheduler.activePIDList.push(process.pid);  
                 _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, process.pState);
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);
                 _CpuScheduler.start();
             }
             else { //if the process doesnt exist
@@ -241,7 +244,7 @@ module TSOS {
                 _CpuScheduler.activePIDList.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, process.pState);
+                Control.updateProcessTable(process.pid, process.pState, "Memory");
             }
             _CpuScheduler.start();
         }
@@ -337,7 +340,7 @@ module TSOS {
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState, "Memory");
             }
             nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
             if (nextProcess.pBase == 999){

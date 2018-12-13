@@ -97,7 +97,7 @@ var TSOS;
             var createdFile = false;
             var dirTSB;
             var value = new Array();
-            var asciiFilename;
+            var asciiFilename = new Array();
             var existFilename = this.lookupDataTSB(filename);
             if (existFilename != null) {
                 return "ERROR! A file with that name already exists!";
@@ -115,12 +115,19 @@ var TSOS;
                             for (var k = 1; k < 4; k++) {
                                 value[k] = dataTSB.charAt(k - 1);
                             }
-                            asciiFilename = filename.toString();
-                            for (var j = 0; j < asciiFilename.length; j++) {
-                                value[j + 4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
+                            asciiFilename = this.stringToAsciiHex(filename.toString());
+                            var index = 4;
+                            while (asciiFilename.length > 0) {
+                                value[index] = asciiFilename.pop();
+                                index++;
                             }
                             this.updateTSB(dirTSB, value);
-                            return filename + " - File created";
+                            if (value[4] == "2E") {
+                                return filename + "Created a hidden file.";
+                            }
+                            else {
+                                return filename + "Created a file.";
+                            }
                         }
                         else {
                             return "ERROR! Disk is full!";
@@ -339,7 +346,7 @@ var TSOS;
             for (var i = 1; i < this.dirTableSize; i++) {
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
-                if (value[0] == "1") {
+                if (value[0] == "1" && value[4] != "2E") {
                     dirFilename = this.getFilename(value);
                     files.push(dirFilename);
                     dirFilename = "";

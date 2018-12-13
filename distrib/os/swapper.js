@@ -14,7 +14,7 @@ var TSOS;
             var opCode;
             var saveUserPrg = _MemoryAccessor.retreiveMemory(baseReg, limitReg);
             saveUserPrg = this.trimUserPrg(saveUserPrg);
-            var newTSB = _krnFileSystemDriver.saveProcess(saveUserPrg);
+            var newTSB = _krnFileSystemDriver.writeProcess(saveUserPrg);
             if (newTSB) {
                 _MemoryManager.clearPartition(baseReg);
                 loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
