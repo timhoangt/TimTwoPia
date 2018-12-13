@@ -213,8 +213,8 @@ module TSOS {
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16);
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16);
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16);
-            row.cells.item(7).innerHTML = pState;
-            row.cells.item(8).innerHTML = pLocation;
+            row.cells.item(8).innerHTML = pState;
+            row.cells.item(9).innerHTML = pLocation;
         }
 
         public static loadDiskTable(): void {

@@ -244,7 +244,7 @@ module TSOS {
                 _CpuScheduler.activePIDList.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, process.pState, "Memory");
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);
             }
             _CpuScheduler.start();
         }

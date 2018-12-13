@@ -223,7 +223,7 @@ var TSOS;
                 _CpuScheduler.activePIDList.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                TSOS.Control.updateProcessTable(process.pid, process.pState, "Memory");
+                TSOS.Control.updateProcessTable(process.pid, process.pState, process.pLocation);
             }
             _CpuScheduler.start();
         };
