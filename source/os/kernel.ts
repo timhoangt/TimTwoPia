@@ -409,7 +409,7 @@ module TSOS {
             this.krnExitProcess(_CpuScheduler.runningProcess);
         }
 
-        public krnWriteProcess(inputOpCodes): string{
+        public krnWriteProcess(inputOpCodes): string{ //goes to filesystemdriver to write the process with the opcodes
             var tsb:string = _krnFileSystemDriver.writeProcess(inputOpCodes);
             return tsb;
         }

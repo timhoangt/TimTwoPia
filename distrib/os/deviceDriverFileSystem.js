@@ -32,25 +32,25 @@ var TSOS;
             _this.sector = 8;
             _this.block = 8;
             _this.blockSize = 64;
-            _this.dirTableSize = _this.sector * _this.block;
+            _this.directoryTableSize = _this.sector * _this.block;
             _this.dataTableSize = (_this.track - 1) * _this.sector * _this.block;
             return _this;
         }
         DeviceDriverFileSystem.prototype.krnFSDriverEntry = function () {
             this.status = "loaded";
-            if (sessionStorage) {
+            if (sessionStorage) { //when a new session is booted
                 if (sessionStorage.length == 0) {
                     var tsb;
-                    var value = new Array();
+                    var value = new Array(); //array for file system
                     for (var i = 0; i < 4; i++) {
-                        value.push("0");
+                        value.push("0"); //pointer
                     }
-                    while (value.length < this.blockSize) {
-                        value.push("00");
+                    while (value.length < this.blockSize) { //when smaller than block size
+                        value.push("00"); //fill it in with 0s
                     }
-                    for (var i = 0; i < this.track; i++) {
-                        for (var j = 0; j < this.sector; j++) {
-                            for (var k = 0; k < this.block; k++) {
+                    for (var i = 0; i < this.track; i++) { //tracks
+                        for (var j = 0; j < this.sector; j++) { //block subsections
+                            for (var k = 0; k < this.block; k++) { //block itself
                                 tsb = i.toString() + j.toString() + k.toString();
                                 sessionStorage.setItem(tsb, JSON.stringify(value));
                             }
@@ -66,66 +66,66 @@ var TSOS;
         DeviceDriverFileSystem.prototype.formatDisk = function () {
             var tsb;
             var value = new Array();
-            for (var i = 0; i < sessionStorage.length; i++) {
+            for (var i = 0; i < sessionStorage.length; i++) { //for storage size
                 var tsb = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(tsb));
-                value[0] = "0";
-                this.updateTSB(tsb, value);
+                value[0] = "0"; //reset the address registers to 0
+                this.updateTSB(tsb, value); //clears values
             }
             return "Disk has been formatted.";
         };
         DeviceDriverFileSystem.prototype.formatFull = function () {
             var tsb;
             var value = new Array();
-            for (var i = 0; i < sessionStorage.length; i++) {
+            for (var i = 0; i < sessionStorage.length; i++) { //for storage size
                 var tsb = sessionStorage.key(i);
-                this.zeroFill(tsb);
+                this.zeroFill(tsb); //run zero fill (resets everything)
             }
             return "Disk has been full formatted.";
         };
         DeviceDriverFileSystem.prototype.zeroFill = function (tsb) {
             var value = value = JSON.parse(sessionStorage.getItem(tsb));
             for (var i = 0; i < 4; i++) {
-                value[i] = "0";
+                value[i] = "0"; //reset address registers
             }
             for (var j = 4; j < value.length; j++) {
-                value[j] = "00";
+                value[j] = "00"; //reset data inside
             }
-            this.updateTSB(tsb, value);
+            this.updateTSB(tsb, value); //clears values
         };
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
-            var createdFile = false;
-            var dirTSB;
+            var createdFile = false; //have to check prereqs first
+            var directoryTSB;
             var value = new Array();
-            var asciiFilename = new Array();
-            var existFilename = this.lookupDataTSB(filename);
-            if (existFilename != null) {
+            var newFileName = new Array(); //create file name
+            var existFilename = this.lookupDataTSB(filename); //check if anotehr file has same name
+            if (existFilename != null) { //error if same name
                 return "ERROR! A file with that name already exists!";
             }
             else {
-                for (var i = 1; i < this.dirTableSize; i++) {
-                    var dirTSB = sessionStorage.key(i);
-                    value = JSON.parse(sessionStorage.getItem(dirTSB));
+                for (var i = 1; i < this.directoryTableSize; i++) { //for directoryectory size
+                    var directoryTSB = sessionStorage.key(i); //give address register
+                    value = JSON.parse(sessionStorage.getItem(directoryTSB));
                     if (value[0] == "0") {
-                        this.zeroFill(dirTSB);
-                        value = JSON.parse(sessionStorage.getItem(dirTSB));
-                        var dataTSB = this.findDataTSB();
+                        this.zeroFill(directoryTSB);
+                        value = JSON.parse(sessionStorage.getItem(directoryTSB));
+                        var dataTSB = this.getTSB();
                         if (dataTSB != null) {
                             value[0] = "1";
                             for (var k = 1; k < 4; k++) {
                                 value[k] = dataTSB.charAt(k - 1);
                             }
-                            asciiFilename = this.stringToAsciiHex(filename.toString());
+                            newFileName = this.convertHex(filename.toString());
                             var index = 4;
-                            while (asciiFilename.length > 0) {
-                                value[index] = asciiFilename.pop();
+                            while (newFileName.length > 0) {
+                                value[index] = newFileName.pop();
                                 index++;
                             }
-                            this.updateTSB(dirTSB, value);
-                            if (value[4] == "2E") {
+                            this.updateTSB(directoryTSB, value);
+                            if (value[4] == "2E") { //if it starts with a .
                                 return filename + " Created a hidden file.";
                             }
-                            else {
+                            else { //if normal name
                                 return filename + " Created a file.";
                             }
                         }
@@ -135,50 +135,50 @@ var TSOS;
                     }
                 }
             }
-            return "ERROR! Directory is full!";
+            return "ERROR! directoryectory is full!";
         };
-        DeviceDriverFileSystem.prototype.findDataTSB = function () {
+        DeviceDriverFileSystem.prototype.getTSB = function () {
             var dataTSB;
             var value = new Array();
             for (var i = 78; i < sessionStorage.length; i++) {
                 dataTSB = sessionStorage.key(i);
-                value = JSON.parse(sessionStorage.getItem(dataTSB));
+                value = JSON.parse(sessionStorage.getItem(dataTSB)); //checks if 0 or 1
                 if (value[0] == "0") {
-                    this.zeroFill(dataTSB);
+                    this.zeroFill(dataTSB); //resets
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     value[0] = "1";
-                    this.updateTSB(dataTSB, value);
+                    this.updateTSB(dataTSB, value); //changes to 1
                     return dataTSB;
                 }
             }
             return null;
         };
         DeviceDriverFileSystem.prototype.lookupDataTSB = function (filename) {
-            var dirTSB;
+            var directoryTSB;
             var dataTSB;
             var value = new Array();
-            var dirFilename;
-            for (var i = 1; i < this.dirTableSize; i++) {
-                dirTSB = sessionStorage.key(i);
-                value = JSON.parse(sessionStorage.getItem(dirTSB));
-                if (value[0] == "1") {
-                    dirFilename = this.getFilename(value);
-                    if (dirFilename == filename) {
+            var directoryFilename;
+            for (var i = 1; i < this.directoryTableSize; i++) { //for directoryectory size
+                directoryTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(directoryTSB));
+                if (value[0] == "1") { //if address register is 1
+                    directoryFilename = this.getFilename(value); //get the file
+                    if (directoryFilename == filename) { //if names match
                         dataTSB = value.splice(1, 3).toString().replace(/,/g, "");
-                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        value = JSON.parse(sessionStorage.getItem(dataTSB)); //get new
                         return dataTSB;
                     }
-                    dirFilename = "";
+                    directoryFilename = "";
                 }
             }
             return null;
         };
         DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
-            var dataTSB = this.lookupDataTSB(filename);
+            var dataTSB = this.lookupDataTSB(filename); //get the address register
             var content = new Array();
             if (dataTSB != null) {
-                content = this.stringToAsciiHex(fileContent);
-                var fileCreated = this.writeToFS(dataTSB, content);
+                content = this.convertHex(fileContent); //fill in the data
+                var fileCreated = this.editFileSystem(dataTSB, content);
                 if (fileCreated) {
                     return filename + " - File written";
                 }
@@ -190,25 +190,25 @@ var TSOS;
                 return "ERROR! File does not exist!";
             }
         };
-        DeviceDriverFileSystem.prototype.writeToFS = function (dataTSB, content) {
+        DeviceDriverFileSystem.prototype.editFileSystem = function (dataTSB, content) {
             var tsbUsed = new Array();
-            var firstTSB = dataTSB;
-            var value = new Array();
+            var firstTSB = dataTSB; //address registers
+            var value = new Array(); //array of values
             var valueIndex = 0;
             var firstIndex;
             value = JSON.parse(sessionStorage.getItem(dataTSB));
             var pointer = this.getPointer(value);
-            if (pointer == "000") {
+            if (pointer == "000") { //if pointer is empty
                 valueIndex = 4;
             }
             else {
-                while (pointer != "-1-1-1") {
+                while (pointer != "-1-1-1") { //if pointer is active
                     dataTSB = pointer;
-                    tsbUsed.push(dataTSB);
+                    tsbUsed.push(dataTSB); //get address register
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     pointer = this.getPointer(value);
                 }
-                for (var i = 4; i < value.length; i++) {
+                for (var i = 4; i < value.length; i++) { //end of data
                     if (value[i] == "00") {
                         valueIndex = i;
                         break;
@@ -219,23 +219,23 @@ var TSOS;
             while (content.length > 0) {
                 if (valueIndex == this.blockSize) {
                     var oldDataTSB = dataTSB;
-                    dataTSB = this.findDataTSB();
+                    dataTSB = this.getTSB();
                     tsbUsed.push(dataTSB);
                     if (dataTSB != null) {
                         for (var k = 1; k < 4; k++) {
                             value[k] = dataTSB.charAt(k - 1);
                         }
-                        this.updateTSB(oldDataTSB, value);
+                        this.updateTSB(oldDataTSB, value); //gets new address register
                         value = JSON.parse(sessionStorage.getItem(dataTSB));
                         valueIndex = 4;
                     }
                     else {
-                        for (var tsb in tsbUsed) {
+                        for (var tsb in tsbUsed) { //resets address register
                             this.zeroFill(tsb);
                         }
                         for (var m = firstIndex; m < this.blockSize; m++) {
                             value = JSON.parse(sessionStorage.getItem(firstTSB));
-                            value[m] = "00";
+                            value[m] = "00"; //resets value
                             this.updateTSB(firstTSB, value);
                         }
                         return false;
@@ -254,50 +254,50 @@ var TSOS;
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
             var fileContent = filename + ": ";
-            var dataTSB = this.lookupDataTSB(filename);
+            var dataTSB = this.lookupDataTSB(filename); //look up address
             var value = new Array();
             var pointer;
             var index;
             var charCode;
-            if (dataTSB != null) {
-                value = JSON.parse(sessionStorage.getItem(dataTSB));
+            if (dataTSB != null) { //if address register is active
+                value = JSON.parse(sessionStorage.getItem(dataTSB)); //get data
                 pointer = this.getPointer(value);
                 index = 4;
-                while (index < this.blockSize && value[index] != "00") {
+                while (index < this.blockSize && value[index] != "00") { //dont retrive if empty
                     charCode = parseInt(value[index], 16);
-                    fileContent = fileContent + String.fromCharCode(charCode);
+                    fileContent = fileContent + String.fromCharCode(charCode); //send data
                     index++;
-                    if (index == this.blockSize && pointer != "-1-1-1") {
+                    if (index == this.blockSize && pointer != "-1-1-1") { //if pointer is active
                         value = JSON.parse(sessionStorage.getItem(pointer));
-                        pointer = this.getPointer(value);
+                        pointer = this.getPointer(value); //get pointer
                         index = 4;
                     }
                 }
-                return fileContent;
+                return fileContent; //send data in file
             }
             else {
                 return "ERROR! File does not exist!";
             }
         };
         DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
-            var dataTSB = this.lookupDataTSB(filename);
-            var dirTSB;
+            var dataTSB = this.lookupDataTSB(filename); //look up address register
+            var directoryTSB;
             var value = new Array();
             var pointer;
             if (dataTSB != null) {
-                for (var i = 0; i < this.dirTableSize; i++) {
-                    dirTSB = sessionStorage.key(i);
-                    value = JSON.parse(sessionStorage.getItem(dirTSB));
+                for (var i = 0; i < this.directoryTableSize; i++) {
+                    directoryTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(directoryTSB));
                     pointer = this.getPointer(value);
                     if (pointer == dataTSB) {
-                        value[0] = "0";
-                        this.updateTSB(dirTSB, value);
+                        value[0] = "0"; //if pointer isnt active
+                        this.updateTSB(directoryTSB, value);
                         break;
                     }
                 }
                 pointer = this.deleteHelper(dataTSB);
                 if (pointer != "000") {
-                    while (pointer != "-1-1-1") {
+                    while (pointer != "-1-1-1") { //if pointer is active
                         dataTSB = pointer;
                         value = JSON.parse(sessionStorage.getItem(dataTSB));
                         value[0] = "0";
@@ -314,64 +314,64 @@ var TSOS;
         };
         DeviceDriverFileSystem.prototype.updateTSB = function (tsb, value) {
             sessionStorage.setItem(tsb, JSON.stringify(value));
-            TSOS.Control.updateDiskTable(tsb);
+            TSOS.Control.updateDiskTable(tsb); //send data to control.js
         };
         DeviceDriverFileSystem.prototype.getPointer = function (value) {
-            var pointer = value[1] + value[2] + value[3];
+            var pointer = value[1] + value[2] + value[3]; //pointer is the three digit number
             return pointer;
         };
         DeviceDriverFileSystem.prototype.getFilename = function (value) {
             var index = 4;
             var letter;
-            var dirFilename = "";
-            while (value[index] != "00" && index < this.blockSize) {
+            var directoryFilename = "";
+            while (value[index] != "00" && index < this.blockSize) { //gets file name from block
                 letter = String.fromCharCode(parseInt(value[index], 16));
-                dirFilename = dirFilename + letter;
+                directoryFilename = directoryFilename + letter;
                 index++;
             }
-            return dirFilename;
+            return directoryFilename;
         };
         DeviceDriverFileSystem.prototype.deleteHelper = function (tsb) {
-            var value = JSON.parse(sessionStorage.getItem(tsb));
+            var value = JSON.parse(sessionStorage.getItem(tsb)); //gets address register
             value[0] = "0";
             this.updateTSB(tsb, value);
             var pointer = this.getPointer(value);
             return pointer;
         };
         DeviceDriverFileSystem.prototype.listFiles = function () {
-            var dirTSB;
-            var value = new Array();
-            var dirFilename;
-            var files = new Array();
-            for (var i = 1; i < this.dirTableSize; i++) {
-                dirTSB = sessionStorage.key(i);
-                value = JSON.parse(sessionStorage.getItem(dirTSB));
-                if (value[0] == "1" && value[4] != "2E") {
-                    dirFilename = this.getFilename(value);
-                    files.push(dirFilename);
-                    dirFilename = "";
+            var directoryTSB;
+            var value = new Array(); //makes title from data
+            var directoryFilename;
+            var files = new Array(); //makes array of titles
+            for (var i = 1; i < this.directoryTableSize; i++) { //for table size
+                directoryTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(directoryTSB)); //get from address registers
+                if (value[0] == "1" && value[4] != "2E") { //not hidden
+                    directoryFilename = this.getFilename(value);
+                    files.push(directoryFilename);
+                    directoryFilename = "";
                 }
             }
             return (files);
         };
         DeviceDriverFileSystem.prototype.listHiddenFiles = function () {
-            var dirTSB;
-            var value = new Array();
-            var dirFilename;
-            var files = new Array();
-            for (var i = 1; i < this.dirTableSize; i++) {
-                dirTSB = sessionStorage.key(i);
-                value = JSON.parse(sessionStorage.getItem(dirTSB));
-                if (value[0] == "1") {
-                    dirFilename = this.getFilename(value);
-                    files.push(dirFilename);
-                    dirFilename = "";
+            var directoryTSB;
+            var value = new Array(); //makes title from data
+            var directoryFilename;
+            var files = new Array(); //makes array of titles
+            for (var i = 1; i < this.directoryTableSize; i++) { //for table size
+                directoryTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(directoryTSB)); //get from address registers
+                if (value[0] == "1") { //all files
+                    directoryFilename = this.getFilename(value);
+                    files.push(directoryFilename);
+                    directoryFilename = "";
                 }
             }
             return (files);
         };
-        DeviceDriverFileSystem.prototype.stringToAsciiHex = function (string) {
-            var asciiHex = new Array();
+        DeviceDriverFileSystem.prototype.convertHex = function (string) {
+            var asciiHex = new Array(); //converts to ASCII
             var hexVal;
             for (var i = string.length - 1; i >= 0; i--) {
                 hexVal = string.charCodeAt(i).toString(16);
@@ -379,16 +379,16 @@ var TSOS;
             }
             return asciiHex;
         };
-        DeviceDriverFileSystem.prototype.writeProcess = function (userPrg) {
-            var dataTSB = this.findDataTSB();
+        DeviceDriverFileSystem.prototype.writeProcess = function (programInput) {
+            var dataTSB = this.getTSB();
             var content = new Array();
             if (dataTSB != null) {
-                while (userPrg.length > 0) {
-                    content.push(userPrg.pop());
+                while (programInput.length > 0) {
+                    content.push(programInput.pop());
                 }
-                var processLoaded = this.writeToFS(dataTSB, content);
+                var processLoaded = this.editFileSystem(dataTSB, content); //when loaded, add into FS
                 if (processLoaded) {
-                    return dataTSB;
+                    return dataTSB; //return the address register
                 }
                 else {
                     return null;
@@ -400,33 +400,33 @@ var TSOS;
         };
         DeviceDriverFileSystem.prototype.retrieveProcess = function (tsb) {
             var value = JSON.parse(sessionStorage.getItem(tsb));
-            var userPrg = new Array();
-            var pointer = this.getPointer(value);
+            var programInput = new Array();
+            var pointer = this.getPointer(value); //gets address register
             var index = 4;
             var opCode;
-            while (pointer != "-1-1-1") {
+            while (pointer != "-1-1-1") { //if bigger than one block
                 while (index < value.length) {
                     opCode = value[index];
-                    userPrg.push(opCode);
-                    index++;
+                    programInput.push(opCode);
+                    index++; //gets data
                 }
-                value[0] = "0";
+                value[0] = "0"; //empties block
                 this.updateTSB(tsb, value);
                 value = JSON.parse(sessionStorage.getItem(pointer));
                 pointer = this.getPointer(value);
                 index = 4;
             }
-            while (index < value.length) {
+            while (index < value.length) { //adds to previous block
                 opCode = value[index];
-                userPrg.push(opCode);
+                programInput.push(opCode);
                 index++;
             }
-            value[0] = "0";
+            value[0] = "0"; //empties block again
             this.updateTSB(tsb, value);
-            if (userPrg.length > 256) {
-                userPrg.splice(256, (userPrg.length - 256));
+            if (programInput.length > 256) { //splices it into smaller sections
+                programInput.splice(256, (programInput.length - 256));
             }
-            return userPrg;
+            return programInput;
         };
         return DeviceDriverFileSystem;
     }(TSOS.DeviceDriver));

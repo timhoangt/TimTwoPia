@@ -146,7 +146,7 @@ module TSOS {
             row.id = "pid" + process.pid;
             var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
 
-            //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
+            //initializes pID, PC, IR, ACC,X, Y, Z, Priority, State, Location
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -229,24 +229,24 @@ module TSOS {
             for (var i = 0; i < sessionStorage.length; i++){
                 var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
                 tsb = sessionStorage.key(i).toString();
-                var dataBlock = this.breakdownBlock(tsb);
+                var dataBlock = this.blockAssemble(tsb);
                 row.id = tsb;
                 var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
 
                 var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" +tsb.charAt(2));
                 cell.appendChild(cellText);
                 row.appendChild(cell);        
-
+                //id
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);  
-
+                //pointers
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
-                row.appendChild(cell); 
-
+                row.appendChild(cell);
+                //data
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
@@ -257,21 +257,23 @@ module TSOS {
             diskContainer.appendChild(diskTable);
         }
 
+        //updates the disk
         public static updateDiskTable(tsb): void {
             var diskTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbFS");
-            var dataBlock = this.breakdownBlock(tsb);            
+            var dataBlock = this.blockAssemble(tsb);            
             diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();             
             diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop(); 
             diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
          }
 
-        public static breakdownBlock(tsb): string[]{
+        //assembles the block passed on
+        public static blockAssemble(tsb): string[]{
             var dataBlock = new Array<string>();
             var value: string[] = JSON.parse(sessionStorage.getItem(tsb));
             var dataBytes: string = value.splice(4,60).toString().replace(/,/g,"");
             dataBlock.push(dataBytes);
-            var pointerByte: string = value.splice(1,3).toString().replace(/,/g,"");
-            dataBlock.push(pointerByte);
+            var pointer: string = value.splice(1,3).toString().replace(/,/g,"");
+            dataBlock.push(pointer);
             var firstByte: string = value.splice(0,1).toString();
             dataBlock.push(firstByte);
             return dataBlock;       
@@ -459,7 +461,8 @@ module TSOS {
             }
         }
 
-        public static updateDisplaySchedule(schedule): void{
+        //shows what scheduling youre using
+        public static updateScheduling(schedule): void{
             var scheduleDisplay: HTMLBodyElement = <HTMLBodyElement> document.getElementById("scheduleAlg");
             scheduleDisplay.innerHTML = schedule;
         }

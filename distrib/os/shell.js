@@ -417,7 +417,7 @@ var TSOS;
                                 var pid = _Kernel.krnCreateProcess(baseReg, priority, tsb);
                             }
                             else {
-                                _StdOut.putText("ERROR_DISK_FULL");
+                                _StdOut.putText("ERROR! Not enough room on the disk!");
                             }
                         }
                         else {

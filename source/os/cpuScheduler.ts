@@ -13,28 +13,28 @@ module TSOS {
         public runningProcess;
 
         public start(): void { //starting the first program in a batch
-            if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
-                this.sortPriority();
+            if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){ //if priority
+                this.sortPriority(); //run sortpriority
             }
             this.currCycle = 0;
             this.totalCycles = 0;
             this.runningProcess = _ReadyQueue.dequeue();
-            if (this.runningProcess.pBase == 999){
-                var victim = _ReadyQueue.dequeue();
-                while(victim.pBase == 999){
-                    _ReadyQueue.enqueue(victim);
-                    victim = _ReadyQueue.dequeue;
+            if (this.runningProcess.pBase == 999){ //if 1st process in queue is in memory
+                var target = _ReadyQueue.dequeue(); //swap with process in memory
+                while(target.pBase == 999){
+                    _ReadyQueue.enqueue(target);
+                    target = _ReadyQueue.dequeue;
                 }
-                var tsb = _Swapper.swapProcess(this.runningProcess.tsb, victim.pBase, victim.pLimit);
-                if (tsb){
-                    this.runningProcess.pBase = victim.pBase;
-                    this.runningProcess.pLimit = victim.pLimit;
-                    victim.tsb = tsb;
-                    victim.pBase = 999;
-                    _ReadyQueue.enqueue(victim);
+                var tsb = _Swapper.swapProcess(this.runningProcess.tsb, target.pBase, target.pLimit);
+                if (tsb){ //if swapped
+                    this.runningProcess.pBase = target.pBase; //back inside process queue inside disk
+                    this.runningProcess.pLimit = target.pLimit;
+                    target.tsb = tsb;
+                    target.pBase = 999;
+                    _ReadyQueue.enqueue(target);
                 }
-                else{
-                var error = "Disk and memory are full."
+                else{ //no more room on disk
+                var error = "Not enough room on disk."
                 _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, error));
                 _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                 _CPU.init();
@@ -64,28 +64,28 @@ module TSOS {
             }
         }
 
-        public setSchedule(args): string{
+        public setSchedule(args): string{ 
             var returnMsg:string;
             var newSchedule:string = args.toString();
-            switch(newSchedule){
+            switch(newSchedule){ //changes scheduling according to what was written after the command
                 case "rr":
                     this.schedule = "Round Robin";
-                    this.quantum = 6;
-                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
+                    this.quantum = 6; //quantum shorter for RR b/c shorter switchesa
+                    returnMsg = "CPU scheduling algorithm is " + this.schedule;
                     break;
                 case "fcfs":
                     this.schedule = "First-come, First-serve";
                     this.quantum = 1000;
-                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
+                    returnMsg = "CPU scheduling algorithm is " + this.schedule;
                     break;
                 case "priority":
                     this.schedule = "Non-preemptive Priority";
                     this.quantum = 1000;
-                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
+                    returnMsg = "CPU scheduling algorithm is " + this.schedule;
                 default:
-                    returnMsg = "CPU scheduling algorithm is: " + this.schedule;
+                    returnMsg = "CPU scheduling algorithm has not changed." + this.schedule;
             }
-            Control.updateDisplaySchedule(this.schedule);
+            Control.updateScheduling(this.schedule);
             return returnMsg;
         }
 
@@ -93,9 +93,9 @@ module TSOS {
             var firstProcess = _ReadyQueue.dequeue();
             var secondProcess;
             var comparison = 0;
-            while(comparison<_ReadyQueue.getSize()){
+            while(comparison<_ReadyQueue.getSize()){ //compare priorities of processes
                 secondProcess = _ReadyQueue.dequeue();
-                if(secondProcess.pPriority < firstProcess.pPriority){
+                if(secondProcess.pPriority < firstProcess.pPriority){ //queue from lowest to highest number
                     _ReadyQueue.enqueue(firstProcess);
                     firstProcess = secondProcess;
                 }

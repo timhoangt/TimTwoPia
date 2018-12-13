@@ -10,31 +10,31 @@ var TSOS;
         }
         Swapper.prototype.swapProcess = function (tsb, baseReg, limitReg) {
             var newLocs = new Array();
-            var loadUserPrg = new Array();
+            var loadprogramInput = new Array();
             var opCode;
-            var saveUserPrg = _MemoryAccessor.retreiveMemory(baseReg, limitReg);
-            saveUserPrg = this.trimUserPrg(saveUserPrg);
-            var newTSB = _krnFileSystemDriver.writeProcess(saveUserPrg);
-            if (newTSB) {
-                _MemoryManager.clearPartition(baseReg);
-                loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
-                loadUserPrg = this.trimUserPrg(loadUserPrg);
-                for (var j = 0; j < loadUserPrg.length; j++) {
-                    _MemoryAccessor.appendMemory(baseReg, baseReg + j, loadUserPrg[j]);
+            var saveprogramInput = _MemoryAccessor.retreiveMemory(baseReg, limitReg); //get program from memory
+            saveprogramInput = this.trimprogramInput(saveprogramInput);
+            var newTSB = _krnFileSystemDriver.writeProcess(saveprogramInput); //put into disk
+            if (newTSB) { //when address register active
+                _MemoryManager.clearPartition(baseReg); //reset partition
+                loadprogramInput = _krnFileSystemDriver.retrieveProcess(tsb); //load program from disk
+                loadprogramInput = this.trimprogramInput(loadprogramInput);
+                for (var j = 0; j < loadprogramInput.length; j++) {
+                    _MemoryAccessor.appendMemory(baseReg, baseReg + j, loadprogramInput[j]);
                 }
                 return newTSB;
             }
             else {
-                return null;
+                return null; //if no space
             }
         };
-        Swapper.prototype.trimUserPrg = function (userPrg) {
-            var opCode = userPrg.pop();
-            while (opCode == "00") {
-                opCode = userPrg.pop();
+        Swapper.prototype.trimprogramInput = function (programInput) {
+            var opCode = programInput.pop();
+            while (opCode == "00") { //if empty data
+                opCode = programInput.pop();
             }
-            userPrg.push(opCode);
-            return userPrg;
+            programInput.push(opCode);
+            return programInput;
         };
         return Swapper;
     }());

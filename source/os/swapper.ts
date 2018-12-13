@@ -5,33 +5,35 @@
      ------------ */
 module TSOS {
     export class Swapper {
+
         public swapProcess(tsb, baseReg, limitReg): string{
             var newLocs = new Array<string>();
-            var loadUserPrg = new Array<string>();
+            var loadprogramInput = new Array<string>();
             var opCode: string;
-            var saveUserPrg: string[] = _MemoryAccessor.retreiveMemory(baseReg, limitReg);
-            saveUserPrg = this.trimUserPrg(saveUserPrg);
-            var newTSB:string = _krnFileSystemDriver.writeProcess(saveUserPrg);
-            if (newTSB){
-                _MemoryManager.clearPartition(baseReg);
-                loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
-                loadUserPrg = this.trimUserPrg(loadUserPrg);
-                for(var j=0; j<loadUserPrg.length; j++){
-                    _MemoryAccessor.appendMemory(baseReg, baseReg+j, loadUserPrg[j]);
+            var saveprogramInput: string[] = _MemoryAccessor.retreiveMemory(baseReg, limitReg); //get program from memory
+            saveprogramInput = this.trimprogramInput(saveprogramInput); 
+            var newTSB:string = _krnFileSystemDriver.writeProcess(saveprogramInput); //put into disk
+            if (newTSB){ //when address register active
+                _MemoryManager.clearPartition(baseReg); //reset partition
+                loadprogramInput = _krnFileSystemDriver.retrieveProcess(tsb); //load program from disk
+                loadprogramInput = this.trimprogramInput(loadprogramInput);
+                for(var j=0; j<loadprogramInput.length; j++){
+                    _MemoryAccessor.appendMemory(baseReg, baseReg+j, loadprogramInput[j]);
                 }
                 return newTSB;
             }
             else{
-                return null;
+                return null; //if no space
             }
         }
-        public trimUserPrg(userPrg): string[]{
-            var opCode = userPrg.pop();
-            while (opCode == "00"){
-                opCode = userPrg.pop();
+
+        public trimprogramInput(programInput): string[]{ //ignores empty data
+            var opCode = programInput.pop();
+            while (opCode == "00"){ //if empty data
+                opCode = programInput.pop();
             }
-            userPrg.push(opCode);
-            return userPrg;
+            programInput.push(opCode);
+            return programInput;
         }
     }
 } 

@@ -40,11 +40,13 @@ module TSOS {
             }
         }
 
+        //gets data from disk and turns it into string
         public retreiveMemory(baseReg, limitReg):string[]{
             var value: string[] = _Memory.memory.slice(baseReg,(baseReg+limitReg+1));
             return value;
         }
         
+        //puts data into disk
         public appendMemory(baseReg,index,data){
             _Memory.memory[index] = data.toString(16).toUpperCase();
             Control.updateMemoryTable(baseReg);

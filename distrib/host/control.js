@@ -127,7 +127,7 @@ var TSOS;
             var row = document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell = document.createElement("td");
-            //initializes pID, PC, IR, ACC,X, Y, Z, State, Location
+            //initializes pID, PC, IR, ACC,X, Y, Z, Priority, State, Location
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -197,20 +197,23 @@ var TSOS;
             for (var i = 0; i < sessionStorage.length; i++) {
                 var row = document.createElement("tr");
                 tsb = sessionStorage.key(i).toString();
-                var dataBlock = this.breakdownBlock(tsb);
+                var dataBlock = this.blockAssemble(tsb);
                 row.id = tsb;
                 var cell = document.createElement("td");
                 var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" + tsb.charAt(2));
                 cell.appendChild(cellText);
                 row.appendChild(cell);
+                //id
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);
+                //pointers
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);
+                //data
                 cell = document.createElement("td");
                 cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
@@ -220,20 +223,22 @@ var TSOS;
             diskTable.appendChild(diskTableBody);
             diskContainer.appendChild(diskTable);
         };
+        //updates the disk
         Control.updateDiskTable = function (tsb) {
             var diskTable = document.getElementById("tbFS");
-            var dataBlock = this.breakdownBlock(tsb);
+            var dataBlock = this.blockAssemble(tsb);
             diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();
             diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop();
             diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
         };
-        Control.breakdownBlock = function (tsb) {
+        //assembles the block passed on
+        Control.blockAssemble = function (tsb) {
             var dataBlock = new Array();
             var value = JSON.parse(sessionStorage.getItem(tsb));
             var dataBytes = value.splice(4, 60).toString().replace(/,/g, "");
             dataBlock.push(dataBytes);
-            var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
-            dataBlock.push(pointerByte);
+            var pointer = value.splice(1, 3).toString().replace(/,/g, "");
+            dataBlock.push(pointer);
             var firstByte = value.splice(0, 1).toString();
             dataBlock.push(firstByte);
             return dataBlock;
@@ -396,7 +401,8 @@ var TSOS;
                 document.getElementById("btnNextStep").style.color = "lime";
             }
         };
-        Control.updateDisplaySchedule = function (schedule) {
+        //shows what scheduling youre using
+        Control.updateScheduling = function (schedule) {
             var scheduleDisplay = document.getElementById("scheduleAlg");
             scheduleDisplay.innerHTML = schedule;
         };
