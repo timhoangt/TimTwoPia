@@ -565,10 +565,19 @@ var TSOS;
             }
         };
         Shell.prototype.shellLs = function (args) {
-            var files = _krnFileSystemDriver.listFiles();
-            _StdOut.putText("Files: ");
-            for (var file in files) {
-                _StdOut.putText(files[file] + "   ");
+            if (args == "-l") {
+                var files = _krnFileSystemDriver.listHiddenFiles(args);
+                _StdOut.putText("Files: ");
+                for (var file in files) {
+                    _StdOut.putText(files[file] + "   ");
+                }
+            }
+            else if (args == "") {
+                var files = _krnFileSystemDriver.listFiles(args);
+                _StdOut.putText("Files: ");
+                for (var file in files) {
+                    _StdOut.putText(files[file] + "   ");
+                }
             }
         };
         Shell.prototype.shellFormat = function (args) {

@@ -349,19 +349,32 @@ module TSOS {
             return pointer;
         }
 
-        public listFiles(arg): string[]{
+        public listFiles(): string[]{
             var dirTSB: string;
             var value = new Array<string>();
             var dirFilename: string;
             var files = new Array<string>();
-            var hiding = false;
-            if (arg === "-l"){
-                var hiding = true;
-            }
             for (var i=1; i<this.dirTableSize; i++){
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
                 if(value[0]=="1" && value[4]!="2E"){
+                    dirFilename = this.getFilename(value);
+                    files.push(dirFilename);
+                    dirFilename = "";
+                }
+            }
+            return(files);
+        }
+
+        public listHiddenFiles(): string[]{
+            var dirTSB: string;
+            var value = new Array<string>();
+            var dirFilename: string;
+            var files = new Array<string>();
+            for (var i=1; i<this.dirTableSize; i++){
+                dirTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(dirTSB));
+                if(value[0]=="1"){
                     dirFilename = this.getFilename(value);
                     files.push(dirFilename);
                     dirFilename = "";

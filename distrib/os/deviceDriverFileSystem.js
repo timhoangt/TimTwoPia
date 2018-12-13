@@ -338,19 +338,31 @@ var TSOS;
             var pointer = this.getPointer(value);
             return pointer;
         };
-        DeviceDriverFileSystem.prototype.listFiles = function (arg) {
+        DeviceDriverFileSystem.prototype.listFiles = function () {
             var dirTSB;
             var value = new Array();
             var dirFilename;
             var files = new Array();
-            var hiding = false;
-            if (arg === "-l") {
-                var hiding = true;
-            }
             for (var i = 1; i < this.dirTableSize; i++) {
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
                 if (value[0] == "1" && value[4] != "2E") {
+                    dirFilename = this.getFilename(value);
+                    files.push(dirFilename);
+                    dirFilename = "";
+                }
+            }
+            return (files);
+        };
+        DeviceDriverFileSystem.prototype.listHiddenFiles = function () {
+            var dirTSB;
+            var value = new Array();
+            var dirFilename;
+            var files = new Array();
+            for (var i = 1; i < this.dirTableSize; i++) {
+                dirTSB = sessionStorage.key(i);
+                value = JSON.parse(sessionStorage.getItem(dirTSB));
+                if (value[0] == "1") {
                     dirFilename = this.getFilename(value);
                     files.push(dirFilename);
                     dirFilename = "";

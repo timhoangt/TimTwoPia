@@ -681,10 +681,19 @@ module TSOS {
         }
 
         public shellLs(args){
-            var files: string[] = _krnFileSystemDriver.listFiles();
-            _StdOut.putText("Files: ");
-            for(var file in files){
-                _StdOut.putText(files[file] + "   ");
+            if(args == "-l"){
+                var files: string[] = _krnFileSystemDriver.listHiddenFiles(args);
+                _StdOut.putText("Files: ");
+                for(var file in files){
+                    _StdOut.putText(files[file] + "   ");
+                }
+            }
+            else if(args == ""){
+                var files: string[] = _krnFileSystemDriver.listFiles(args);
+                _StdOut.putText("Files: ");
+                for(var file in files){
+                    _StdOut.putText(files[file] + "   ");
+                }
             }
         }
 
