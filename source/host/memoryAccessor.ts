@@ -39,5 +39,15 @@ module TSOS {
                 return value;
             }
         }
-}
+
+        public retreiveMemory(baseReg, limitReg):string[]{
+            var value: string[] = _Memory.memory.slice(baseReg,(baseReg+limitReg+1));
+            return value;
+        }
+        
+        public appendMemory(baseReg,index,data){
+            _Memory.memory[index] = data.toString(16).toUpperCase();
+            Control.updateMemoryTable(baseReg);
+        }
+    }
 }

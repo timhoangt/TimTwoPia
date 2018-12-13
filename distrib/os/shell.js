@@ -395,31 +395,46 @@ var TSOS;
                 _StdOut.putText("Usage: error <string> - Please supply a string.");
         };
         Shell.prototype.shellLoad = function (args) {
-            var programInput = document.getElementById("taProgramInput").value;
-            programInput = programInput.replace(/(\r\n|\n|\r)/gm, "");
-            var input = /^[a-f\d\s]+$/i; //hex digit filter
-            if (input.test(programInput)) { //test if text matches hex digit
-                var inputOpCodes = programInput.split(" ");
-                if (inputOpCodes.length > 256) {
-                    _StdOut.putText("Not enough memory for this program.");
+            var priority = 10;
+            var valText = /^\d*$/;
+            if (valText.test(args[0]) || args[0] == null) {
+                if (args[0] != null) {
+                    priority = args[0];
                 }
-                else {
-                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
-                    if (baseReg == 999) {
-                        var returnMsg = _Kernel.krnWriteProcess(inputOpCodes);
-                        _StdOut.putText(returnMsg);
+                var userProgram = document.getElementById("taProgramInput").value;
+                userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+                var valText = /^[a-f\d\s]+$/i;
+                if (valText.test(userProgram)) {
+                    var inputOpCodes = userProgram.split(" ");
+                    if (inputOpCodes.length > 256) {
+                        _StdOut.putText("Process is too big for memory.");
                     }
                     else {
-                        var pid = _Kernel.krnCreateProcess(baseReg, null);
-                        _StdOut.putText("pID " + pid + " is in resident Queue");
+                        var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                        if (baseReg == 999) {
+                            var tsb = _Kernel.krnWriteProcess(inputOpCodes);
+                            if (tsb) {
+                                var pid = _Kernel.krnCreateProcess(baseReg, priority, tsb);
+                            }
+                            else {
+                                _StdOut.putText("ERROR_DISK_FULL");
+                            }
+                        }
+                        else {
+                            var pid = _Kernel.krnCreateProcess(baseReg, priority, null);
+                        }
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                     }
                 }
-            }
-            else if (programInput == "") {
-                _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                else if (userProgram == "") {
+                    _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                }
+                else {
+                    _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                }
             }
             else {
-                _StdOut.putText("Please enter a hex digit."); //if it doesnt match
+                _StdOut.putText("Priority must be a number between 0 and 10");
             }
         };
         Shell.prototype.shellRun = function (args) {
@@ -560,7 +575,16 @@ var TSOS;
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
             else {
-                _StdOut.putText(_krnFileSystemDriver.formatDisk());
+                if (args == "quick") {
+                    _StdOut.putText(_krnFileSystemDriver.formatDisk());
+                }
+                else if (args == "full") {
+                    _StdOut.putText(_krnFileSystemDriver.formatFull());
+                }
+                else if (args == "") {
+                    _StdOut.putText("Enter quick or full after format.");
+                    _StdOut.advanceLine();
+                }
             }
         };
         Shell.prototype.shellGetSchedule = function (args) {

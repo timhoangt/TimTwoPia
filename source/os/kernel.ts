@@ -64,6 +64,9 @@ module TSOS {
             _OsShell = new Shell();
             _OsShell.init();
 
+            //initialize swapper
+            _Swapper = new Swapper();
+
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -190,10 +193,10 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        public krnCreateProcess(pBase, tsb) {
+        public krnCreateProcess(pBase, priority, tsb) {
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid, "Resident", 1, tsb);
+            var process = new PCB(pBase, pid, "Resident", priority, tsb);
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -324,7 +327,9 @@ module TSOS {
 
         public contextSwitch(runningProcess){
             if (_CPU.IR != "00"){ //puts process in process control block
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
+                var currProcess;
+                var nextProcess;
+                currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -334,7 +339,29 @@ module TSOS {
                 _ReadyQueue.enqueue(currProcess);
                 Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
-            var nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
+            nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
+            if (nextProcess.pBase == 999){
+                var newTSB: string = _Swapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                if (newTSB){
+                    nextProcess.pBase = runningProcess.pBase;
+                    if(currProcess){
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while(prevProcess.pid!=currProcess.pid){
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        _ReadyQueue.enqueue(prevProcess);
+                    }
+                }
+                else{
+                    var error = "Disk and memory are full."
+                    _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    _CPU.init();
+                }
+            }
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -380,8 +407,8 @@ module TSOS {
         }
 
         public krnWriteProcess(inputOpCodes): string{
-            var returnMsg:string = _krnFileSystemDriver.writeProcess(inputOpCodes);
-            return returnMsg;
+            var tsb:string = _krnFileSystemDriver.writeProcess(inputOpCodes);
+            return tsb;
         }
 
     }

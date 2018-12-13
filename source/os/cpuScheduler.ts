@@ -13,15 +13,42 @@ module TSOS {
         public runningProcess;
 
         public start(): void { //starting the first program in a batch
+            if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
+                this.sortPriority();
+            }
             this.currCycle = 0;
             this.totalCycles = 0;
             this.runningProcess = _ReadyQueue.dequeue();
-            this.runningProcess.pState = "Running";
+            if (this.runningProcess.pBase == 999){
+                var victim = _ReadyQueue.dequeue();
+                while(victim.pBase == 999){
+                    _ReadyQueue.enqueue(victim);
+                    victim = _ReadyQueue.dequeue;
+                }
+                var tsb = _Swapper.swapProcess(this.runningProcess.tsb, victim.pBase, victim.pLimit);
+                if (tsb){
+                    this.runningProcess.pBase = victim.pBase;
+                    this.runningProcess.pLimit = victim.pLimit;
+                    victim.tsb = tsb;
+                    victim.pBase = 999;
+                    _ReadyQueue.enqueue(victim);
+                }
+                else{
+                var error = "Disk and memory are full."
+                _KernelInterruptQueue.enqueue(new Interrupt(PROGRAMERROR_IRQ, error));
+                _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                _CPU.init();
+                }
+            }
+                this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
             Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
         }
 
         public checkSchedule(): void {
+            if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
+                this.sortPriority();
+            }
             if (this.activePIDList.length == 0){ //if there are multiple programs running at once
                     _CPU.init();
             }
@@ -56,10 +83,30 @@ module TSOS {
                     this.quantum = 1000;
                     returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                 default:
-                    this.quantum = 6;
-                    returnMsg = "CPU scheduling algorithm DNE";
+                    returnMsg = "CPU scheduling algorithm is: " + this.schedule;
             }
             return returnMsg;
+        }
+
+        public sortPriority(){
+            var firstProcess = _ReadyQueue.dequeue();
+            var secondProcess;
+            var comparison = 0;
+            while(comparison<_ReadyQueue.getSize()){
+                secondProcess = _ReadyQueue.dequeue();
+                if(secondProcess.pPriority < firstProcess.pPriority){
+                    _ReadyQueue.enqueue(firstProcess);
+                    firstProcess = secondProcess;
+                }
+                else{
+                    _ReadyQueue.enqueue(secondProcess);
+                }
+                comparison++;
+            }
+            _ReadyQueue.enqueue(firstProcess);
+            for(var i=0; i<_ReadyQueue.getSize()-1; i++){
+                _ReadyQueue.enqueue(_ReadyQueue.dequeue());
+            }
         }
 	}
 } 

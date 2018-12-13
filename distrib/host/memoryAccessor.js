@@ -37,6 +37,14 @@ var TSOS;
                 return value;
             }
         };
+        MemoryAccessor.prototype.retreiveMemory = function (baseReg, limitReg) {
+            var value = _Memory.memory.slice(baseReg, (baseReg + limitReg + 1));
+            return value;
+        };
+        MemoryAccessor.prototype.appendMemory = function (baseReg, index, data) {
+            _Memory.memory[index] = data.toString(16).toUpperCase();
+            TSOS.Control.updateMemoryTable(baseReg);
+        };
         return MemoryAccessor;
     }());
     TSOS.MemoryAccessor = MemoryAccessor;

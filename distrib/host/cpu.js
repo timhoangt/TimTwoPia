@@ -189,7 +189,8 @@ var TSOS;
                         this.PC++;
                         break;
                     default: //if there is a program error, the process is stopped and the invalid opcode is sent
-                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, opCode));
+                        var error = "Error. Op code " + opCode + " does not exist.";
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, error));
                         _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         this.init();
                         break;

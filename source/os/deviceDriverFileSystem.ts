@@ -71,6 +71,16 @@ module TSOS {
             return "Disk has been formatted.";
         }
 
+        public formatFull(): string{
+            var tsb: string;
+            var value = new Array<string>();
+            for (var i=0; i<sessionStorage.length;i++){
+                var tsb = sessionStorage.key(i);
+                this.zeroFill(tsb);
+            }
+            return "Disk has been full formatted.";
+        }
+
 
         public zeroFill(tsb){
             var value = value = JSON.parse(sessionStorage.getItem(tsb));
@@ -352,9 +362,9 @@ module TSOS {
         public stringToAsciiHex(string): string[]{
             var asciiHex= new Array<string>();
             var hexVal:string;
-            for(var i=string.length; i>=0; i--){
+            for(var i=string.length - 1; i>=0; i--){
                 hexVal = string.charCodeAt(i).toString(16);
-                asciiHex.push(hexVal);
+                asciiHex.push(hexVal.toUpperCase());
             }
             return asciiHex;
         }
@@ -368,16 +378,47 @@ module TSOS {
                 }
                 var processLoaded = this.writeToFS(dataTSB, content);
                 if (processLoaded){
-                    var pid: number = _Kernel.krnCreateProcess(999, dataTSB);
-                    return "Process id: " + pid + " is in Resident Queue";
+                    return dataTSB;
                 }
                 else{
-                    return "ERROR! Disk is full!";
+                    return null;
                 }
             }
             else {
-                return "ERROR! Disk is full!";
+                return null;
             }
+        }
+
+        public retrieveProcess(tsb): string[]{
+            var value:string[] = JSON.parse(sessionStorage.getItem(tsb));
+            var userPrg = new Array<string>();
+            var pointer: string = this.getPointer(value);
+            var index: number = 4;
+            var opCode: string;
+            while (pointer!="-1-1-1"){
+                
+                while (index<value.length){
+                    opCode = value[index];
+                    userPrg.push(opCode);
+                    index++;
+                }
+                value[0] = "0";
+                this.updateTSB(tsb, value);
+                value = JSON.parse(sessionStorage.getItem(pointer));
+                pointer = this.getPointer(value);
+                index = 4;
+            }
+            while (index<value.length){
+                opCode = value[index];
+                userPrg.push(opCode);
+                index++;
+            }
+            value[0] = "0";
+            this.updateTSB(tsb, value);
+            if (userPrg.length > 256){
+                userPrg.splice(256,(userPrg.length-256));
+            }
+            return userPrg;
         }
     }
 }

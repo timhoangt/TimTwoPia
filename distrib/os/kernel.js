@@ -57,6 +57,8 @@ var TSOS;
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
             _OsShell.init();
+            //initialize swapper
+            _Swapper = new TSOS.Swapper();
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -172,10 +174,10 @@ var TSOS;
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        Kernel.prototype.krnCreateProcess = function (pBase, tsb) {
+        Kernel.prototype.krnCreateProcess = function (pBase, priority, tsb) {
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident", 1, tsb);
+            var process = new TSOS.PCB(pBase, pid, "Resident", priority, tsb);
             //status of program to ready
             _ResidentQueue.enqueue(process);
             //updates process table
@@ -298,7 +300,9 @@ var TSOS;
         };
         Kernel.prototype.contextSwitch = function (runningProcess) {
             if (_CPU.IR != "00") { //puts process in process control block
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
+                var currProcess;
+                var nextProcess;
+                currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -308,7 +312,29 @@ var TSOS;
                 _ReadyQueue.enqueue(currProcess);
                 TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
-            var nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
+            nextProcess = _ReadyQueue.dequeue(); //next program is being executed in CPU
+            if (nextProcess.pBase == 999) {
+                var newTSB = _Swapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                if (newTSB) {
+                    nextProcess.pBase = runningProcess.pBase;
+                    if (currProcess) {
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while (prevProcess.pid != currProcess.pid) {
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        _ReadyQueue.enqueue(prevProcess);
+                    }
+                }
+                else {
+                    var error = "Disk and memory are full.";
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROGRAMERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    _CPU.init();
+                }
+            }
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -351,8 +377,8 @@ var TSOS;
             this.krnExitProcess(_CpuScheduler.runningProcess);
         };
         Kernel.prototype.krnWriteProcess = function (inputOpCodes) {
-            var returnMsg = _krnFileSystemDriver.writeProcess(inputOpCodes);
-            return returnMsg;
+            var tsb = _krnFileSystemDriver.writeProcess(inputOpCodes);
+            return tsb;
         };
         return Kernel;
     }());

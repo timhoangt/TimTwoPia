@@ -38,6 +38,7 @@ var _Memory: TSOS.Memory;
 var _MemoryManager: TSOS.MemoryManager;
 var _MemoryAccessor: TSOS.MemoryAccessor;
 var _CpuScheduler: TSOS.CpuScheduler; // and CPU Scheduler
+var _Swapper: TSOS.Swapper;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -80,6 +81,7 @@ var _krnKeyboardDriver; //  = null;
 var _hardwareClockID: number = null;
 
 var _krnFileSystemDriver;
+
 
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
