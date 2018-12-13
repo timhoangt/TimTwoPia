@@ -123,10 +123,10 @@ module TSOS {
                             }
                             this.updateTSB(dirTSB,value);
                             if (value[4] == "2E"){
-                                return filename + "Created a hidden file.";
+                                return filename + " Created a hidden file.";
                             }
                             else {
-                                return filename + "Created a file.";
+                                return filename + " Created a file.";
                             }
                         }
                         else {
@@ -349,11 +349,15 @@ module TSOS {
             return pointer;
         }
 
-        public listFiles(): string[]{
+        public listFiles(arg): string[]{
             var dirTSB: string;
             var value = new Array<string>();
             var dirFilename: string;
             var files = new Array<string>();
+            var hiding = false;
+            if (arg === "-l"){
+                var hiding = true;
+            }
             for (var i=1; i<this.dirTableSize; i++){
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));

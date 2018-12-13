@@ -123,10 +123,10 @@ var TSOS;
                             }
                             this.updateTSB(dirTSB, value);
                             if (value[4] == "2E") {
-                                return filename + "Created a hidden file.";
+                                return filename + " Created a hidden file.";
                             }
                             else {
-                                return filename + "Created a file.";
+                                return filename + " Created a file.";
                             }
                         }
                         else {
@@ -338,11 +338,15 @@ var TSOS;
             var pointer = this.getPointer(value);
             return pointer;
         };
-        DeviceDriverFileSystem.prototype.listFiles = function () {
+        DeviceDriverFileSystem.prototype.listFiles = function (arg) {
             var dirTSB;
             var value = new Array();
             var dirFilename;
             var files = new Array();
+            var hiding = false;
+            if (arg === "-l") {
+                var hiding = true;
+            }
             for (var i = 1; i < this.dirTableSize; i++) {
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
