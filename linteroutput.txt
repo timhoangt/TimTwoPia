@@ -1,0 +1,24 @@
+Timothys-MacBook-Pro:timtwopia timhoangt$ tslint source/utils.ts > staticout
+Warning: The 'consecutive-overloads' rule requires type information.
+Warning: The 'no-accessor-field-mismatch' rule requires type information.
+Warning: The 'no-array-delete' rule requires type information.
+Warning: The 'no-collection-size-mischeck' rule requires type information.
+Warning: The 'no-dead-store' rule requires type information.
+Warning: The 'no-element-overwrite' rule requires type information.
+Warning: The 'no-gratuitous-expressions' rule requires type information.
+Warning: The 'no-ignored-initial-value' rule requires type information.
+Warning: The 'no-ignored-return' rule requires type information.
+Warning: The 'no-in-misuse' rule requires type information.
+Warning: The 'no-misleading-array-reverse' rule requires type information.
+Warning: The 'no-redundant-boolean' rule requires type information.
+Warning: The 'no-return-type-any' rule requires type information.
+Warning: The 'no-self-assignment' rule requires type information.
+Warning: The 'no-undefined-argument' rule requires type information.
+Warning: The 'no-unused-array' rule requires type information.
+Warning: The 'no-use-of-empty-return-value' rule requires type information.
+Warning: The 'no-useless-cast' rule requires type information.
+Warning: The 'no-useless-intersection' rule requires type information.
+Warning: The 'no-variable-usage-before-declaration' rule requires type information.
+Warning: The 'parameters-max-number' rule requires type information.
+Warning: The 'prefer-immediate-return' rule requires type information.
+Warning: The 'use-type-alias' rule requires type information.

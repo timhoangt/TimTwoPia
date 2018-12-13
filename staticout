@@ -1,0 +1,14 @@
+
+ERROR: source/utils.ts[7, 1]: The internal 'module' syntax is deprecated, use the 'namespace' keyword instead.
+ERROR: source/utils.ts[7, 1]: 'namespace' and 'module' are disallowed
+ERROR: source/utils.ts[30, 13]: Forbidden 'var' keyword, use 'let' or 'const' instead
+ERROR: source/utils.ts[31, 13]: for (... in ...) statements must be filtered with an if statement
+ERROR: source/utils.ts[31, 18]: Forbidden 'var' keyword, use 'let' or 'const' instead
+ERROR: source/utils.ts[31, 22]: Identifier 'i' is never reassigned; use 'const' instead of 'var'.
+ERROR: source/utils.ts[31, 27]: Type assertion using the '<>' syntax is forbidden. Use the 'as' syntax instead.
+ERROR: source/utils.ts[31, 32]: missing whitespace
+ERROR: source/utils.ts[32, 17]: Forbidden 'var' keyword, use 'let' or 'const' instead
+ERROR: source/utils.ts[32, 21]: Identifier 'ch' is never reassigned; use 'const' instead of 'var'.
+ERROR: source/utils.ts[33, 17]: Forbidden 'var' keyword, use 'let' or 'const' instead
+ERROR: source/utils.ts[35, 1]: Exceeds maximum line length of 120
+
