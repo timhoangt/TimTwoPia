@@ -2,8 +2,6 @@
 
 This is an operating system with shell commands and the ability to load and execute several user programs from a file system with a swapped virtual memory to execute more processes than memory partitions.
 
-A video walkthrough of the program can be found here 
-
 A working running version can be accessed without download here https://timhoangt.github.io/TimTwoPia/ but it will not perform the automatic Glados tests.
 
 To run, just double click the index.html file to open in your browser. It will automatically run the tests as specified in glados-ip4.js.
